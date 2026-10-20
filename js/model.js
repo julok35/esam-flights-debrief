@@ -64,6 +64,32 @@ export function newFiche(q, role) {
   };
 }
 
+/** Noms des animaux saisis « Rex, Max » : liste sans vides. */
+export function animauxList(fiche) {
+  return String(fiche.answers.animaux || '')
+    .split(/[,;]/)
+    .map(function (s) {
+      return s.trim();
+    })
+    .filter(Boolean);
+}
+
+/** Titre de la fiche, combiné depuis l'en-tête (q.titre_fiche) : « 20/10/2026 - Rex, Max - Chien - Lac Blanc ». */
+export function ficheTitre(q, fiche) {
+  var a = fiche.answers;
+  return (q.titre_fiche || ['date'])
+    .map(function (k) {
+      if (k === 'date') {
+        var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(a.date || fiche.cree || '');
+        return m ? m[3] + '/' + m[2] + '/' + m[1] : '';
+      }
+      if (k === 'animaux') return animauxList(fiche).join(', ');
+      return String(a[k] || '').trim();
+    })
+    .filter(Boolean)
+    .join(' - ');
+}
+
 export function isEmpty(v) {
   if (v === null || v === undefined || v === '' || v === false) return true;
   if (Array.isArray(v)) return v.length === 0;

@@ -32,8 +32,12 @@
       "l": "Numéro Pat'rouille",
       "aide": "Facultatif à chaud",
       "inputmode": "numeric"
-    }
+    },
+    { "key": "animaux", "type": "text", "l": "Nom des animaux", "aide": "Plusieurs : séparés par des virgules" },
+    { "key": "espece", "type": "text", "l": "Espèce" },
+    { "key": "lieu", "type": "text", "l": "Lieu" }
   ],
+  "titre_fiche": ["date", "animaux", "espece", "lieu"],
   "questions": [
     {
       "id": "C1",

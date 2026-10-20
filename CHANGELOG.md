@@ -2,6 +2,12 @@
 
 Versions de l'appli (semver). La version du questionnaire est suivie à part (`questionnaire.json`, champ `version`) ; les deux figurent dans chaque note exportée.
 
+## 1.1.0 - 2026-10-20
+
+- Titre de chaque debrief, combiné à partir de la date, du nom des animaux, de l'espèce et du lieu : affiché dans l'en-tête de la fiche, la liste d'accueil, le titre de la note et le champ `titre` du frontmatter.
+- Nouveaux champs d'en-tête : nom des animaux (plusieurs, séparés par des virgules), espèce, lieu ; exportés dans le frontmatter (`animaux` en liste, `espece`, `lieu`).
+- Questionnaire inchangé (version 2.0) : seules les données d'en-tête s'enrichissent.
+
 ## 1.0.0 - 2026-10-20
 
 Première version, questionnaire 2.0 (cahier des charges v0.1).

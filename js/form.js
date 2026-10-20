@@ -431,11 +431,21 @@ function fieldBlock(ctx, field, b, reg, visKey) {
   return wrap;
 }
 
+// Titre combiné (date, animaux, espèce, lieu), recalculé à chaque saisie de l'en-tête
+function titrePreview(ctx, reg) {
+  var t = h('strong', { id: 'ficheTitre' });
+  reg.push(function () {
+    t.textContent = M.ficheTitre(ctx.q, ctx.fiche());
+  });
+  return h('p', { class: 'titre' }, 'Titre : ', t);
+}
+
 export function renderEntete(ctx, reg) {
   return h(
     'section',
     { class: 'q entete' },
     h('h2', { class: 'q-t' }, 'Fiche'),
+    titrePreview(ctx, reg),
     ctx.q.entete.map(function (f) {
       var id = nid('e');
       return h(

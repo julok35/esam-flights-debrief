@@ -260,7 +260,7 @@ test('9. frontmatter exporté : YAML valide avec les champs prévus', async ({ p
 test("10. hors ligne après une première visite : l'appli s'ouvre, enregistre et exporte", async ({ page, context }) => {
   await page.goto('/');
   await page.evaluate(() => navigator.serviceWorker.ready);
-  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('esam-debrief-v1.0.0');
+  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('esam-debrief-v1.1.0');
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('#net')).toBeVisible();
@@ -275,6 +275,21 @@ test("10. hors ligne après une première visite : l'appli s'ouvre, enregistre e
   expect(md).toContain('c1: non');
   await page.click('#copyBtn');
   await expect(page.locator('#exportMsg')).toContainText(/Copié|copie-le à la main/);
+});
+
+test("titre combiné affiché dans la fiche, l'accueil et la note", async ({ page }) => {
+  await newFiche(page);
+  await page.fill('[data-key="animaux"] input', 'Rex, Max');
+  await page.fill('[data-key="espece"] input', 'Chien');
+  await page.fill('[data-key="lieu"] input', 'Lac Blanc');
+  var t = /^\d{2}\/\d{2}\/\d{4} - Rex, Max - Chien - Lac Blanc$/;
+  await expect(page.locator('#ficheTitre')).toHaveText(t);
+  await expect(page.locator('.fbar-t strong')).toHaveText(t);
+  var md = await exportText(page);
+  expect(frontmatter(md).titre).toMatch(t);
+  expect(md).toMatch(/\n# \d{2}\/\d{2}\/\d{4} - Rex, Max - Chien - Lac Blanc\n/);
+  await page.click('#homeBtn');
+  await expect(page.locator('#ficheList .card-t')).toHaveText(t);
 });
 
 test('11. aucun tiret cadratin ni demi-cadratin dans une note exportée', async ({ page }) => {

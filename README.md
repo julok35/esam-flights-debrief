@@ -35,7 +35,8 @@ Site statique sans build, servi tel quel (GitHub Pages), sur le modèle de `julo
 
 `Debrief_Drone_AAAA-MM-JJ_<numéro Pat'rouille>.md`
 
-- Frontmatter : `type: debrief-vol-drone`, `debrief_id`, `questionnaire_version`, `app_version`, `statut`, `date`, `date_maj`, `tags`, puis un champ par réponse fermée, dans l'ordre du questionnaire. Valeurs normalisées (`perte-liaison`), listes YAML pour les choix multiples, une clé par ligne de grille (`f8_autonomie`), `f7_incidents` (liste), `f14_issue` (capacité : oui / peut-etre / non). Un champ non renseigné ou masqué est vide.
+- Titre (`titre` et titre de la note) combiné depuis l'en-tête : date, nom des animaux, espèce, lieu, par exemple « 20/10/2026 - Rex, Max - Chien - Lac Blanc ». Ordre réglé par `titre_fiche` dans `questionnaire.json`.
+- Frontmatter : `type: debrief-vol-drone`, `debrief_id`, `questionnaire_version`, `app_version`, `statut`, `titre`, `date`, `patrouille`, `animaux` (liste), `espece`, `lieu`, `date_maj`, `tags`, puis un champ par réponse fermée, dans l'ordre du questionnaire. Valeurs normalisées (`perte-liaison`), listes YAML pour les choix multiples, une clé par ligne de grille (`f8_autonomie`), `f7_incidents` (liste), `f14_issue` (capacité : oui / peut-etre / non). Un champ non renseigné ou masqué est vide.
 - Une grille jamais touchée est exportée vide, pour ne pas compter ses valeurs par défaut dans les tableaux de bord ; dès qu'une ligne est saisie (ou préremplie depuis C4), toutes les lignes sont exportées.
 - C3 : estimations saisies, `c3_ecart_source: estime` ; `c3_ecart_h_calcule` et `c3_ecart_v_calcule` sont laissés vides pour le calcul fait par Claude après coup.
 - Bloc de reprise en fin de note, dans un commentaire Obsidian `%% esam-debrief-data:v1 ... %%` : l'état complet de la fiche (JSON en base64). Ne pas le modifier ; l'import ne lit que lui.

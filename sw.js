@@ -1,6 +1,6 @@
 /* Service worker Debrief drone ESAM : toute l'appli en cache à l'installation, servie depuis le cache (le terrain est
  * souvent sans réseau). Nouvelle version de l'appli : nouveau nom de cache, l'ancien est supprimé. */
-var V = 'esam-debrief-v1.0.0';
+var V = 'esam-debrief-v1.1.0';
 var SHELL = [
   './',
   'index.html',
