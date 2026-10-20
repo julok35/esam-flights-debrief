@@ -136,6 +136,8 @@ test("bloc de reprise : la fiche est restituée à l'identique", () => {
 test('titre combiné : date, animaux, espèce, lieu', () => {
   var f = M.newFiche(q);
   M.setValue(q, f, 'date', '2026-10-19');
+  assert.equal(M.ficheTitre(q, f), '19/10/2026 - Chien', 'espèce par défaut');
+  M.setValue(q, f, 'espece', '');
   assert.equal(M.ficheTitre(q, f), '19/10/2026');
   M.setValue(q, f, 'animaux', ' Rex ,Max,, ');
   M.setValue(q, f, 'lieu', 'Lac Blanc, Belledonne');

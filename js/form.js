@@ -3,6 +3,7 @@
  * Les blocs dont la structure change (fiches F7, capacités F14, remarques) se redessinent seuls quand il le faut. */
 import * as M from './model.js';
 import { h, toast } from './util.js';
+import { currentPosition } from './geo.js';
 
 var seq = 0;
 function nid(p) {
@@ -440,6 +441,50 @@ function titrePreview(ctx, reg) {
   return h('p', { class: 'titre' }, 'Titre : ', t);
 }
 
+/**
+ * Remplit un champ avec la position du téléphone. silent : préremplissage à la création, sans message d'erreur
+ * et sans écraser ce qui a été saisi entre-temps.
+ */
+export function fillPosition(ctx, key, silent) {
+  var f = ctx.fiche();
+  return currentPosition(!silent).then(
+    function (pos) {
+      if (ctx.fiche() !== f || ctx.readOnly() || (silent && f.answers[key])) return;
+      M.setValue(ctx.q, f, key, pos);
+      ctx.commit();
+      if (!silent) toast('Position du téléphone reprise.');
+    },
+    function (e) {
+      if (!silent) toast(e.message);
+    }
+  );
+}
+
+function positionButton(ctx, key, reg) {
+  var b = h(
+    'button',
+    {
+      type: 'button',
+      class: 'btn sec small',
+      'data-geo': key,
+      onclick: function () {
+        if (ctx.readOnly()) return;
+        b.disabled = true;
+        b.textContent = 'Position en cours...';
+        fillPosition(ctx, key, false).then(function () {
+          b.disabled = ctx.readOnly();
+          b.textContent = 'Utiliser ma position';
+        });
+      }
+    },
+    'Utiliser ma position'
+  );
+  reg.push(function () {
+    if (b.textContent === 'Utiliser ma position') b.disabled = ctx.readOnly();
+  });
+  return b;
+}
+
 export function renderEntete(ctx, reg) {
   return h(
     'section',
@@ -452,7 +497,8 @@ export function renderEntete(ctx, reg) {
         'div',
         { class: 'f', 'data-key': f.key },
         h('label', { class: 'f-l', for: id }, f.l, f.aide ? h('small', null, ' (' + f.aide.toLowerCase() + ')') : null),
-        textInput(ctx, f, topBinding(ctx, f.key), id, reg)
+        textInput(ctx, f, topBinding(ctx, f.key), id, reg),
+        f.defaut === 'position' ? positionButton(ctx, f.key, reg) : null
       );
     })
   );

@@ -49,7 +49,9 @@ export function newFiche(q, role) {
   var now = new Date().toISOString();
   var answers = {};
   q.entete.forEach(function (f) {
+    // « position » : rempli plus tard par l'appli (GPS du téléphone), voir fillPosition dans form.js
     if (f.defaut === 'aujourdhui') answers[f.key] = today();
+    else if (f.defaut && f.defaut !== 'position') answers[f.key] = f.defaut;
   });
   return {
     debrief_id: uid(),

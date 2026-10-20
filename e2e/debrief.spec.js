@@ -260,7 +260,7 @@ test('9. frontmatter exporté : YAML valide avec les champs prévus', async ({ p
 test("10. hors ligne après une première visite : l'appli s'ouvre, enregistre et exporte", async ({ page, context }) => {
   await page.goto('/');
   await page.evaluate(() => navigator.serviceWorker.ready);
-  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('esam-debrief-v1.1.0');
+  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('esam-debrief-v1.2.0');
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('#net')).toBeVisible();
@@ -290,6 +290,29 @@ test("titre combiné affiché dans la fiche, l'accueil et la note", async ({ pag
   expect(md).toMatch(/\n# \d{2}\/\d{2}\/\d{4} - Rex, Max - Chien - Lac Blanc\n/);
   await page.click('#homeBtn');
   await expect(page.locator('#ficheList .card-t')).toHaveText(t);
+});
+
+test('espèce préremplie avec chien, lieu prérempli avec la position du téléphone', async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 45.123456, longitude: 5.876543 });
+  await newFiche(page);
+  await expect(page.locator('[data-key="espece"] input')).toHaveValue('Chien');
+  await expect(page.locator('[data-key="lieu"] input')).toHaveValue('45.12346, 5.87654');
+  await expect(page.locator('#ficheTitre')).toHaveText(/ - Chien - 45\.12346, 5\.87654$/);
+  // Champs libres : modifiables, et le bouton reprend la position à la demande
+  await page.fill('[data-key="espece"] input', 'Chat');
+  await page.fill('[data-key="lieu"] input', 'Lac Blanc');
+  await expect(page.locator('#ficheTitre')).toHaveText(/ - Chat - Lac Blanc$/);
+  await context.setGeolocation({ latitude: 45.2, longitude: 5.9 });
+  await page.click('[data-geo="lieu"]');
+  await expect(page.locator('[data-key="lieu"] input')).toHaveValue('45.20000, 5.90000');
+});
+
+test('sans autorisation de position, le lieu reste vide et la fiche fonctionne', async ({ page }) => {
+  await newFiche(page);
+  await page.click('[data-geo="lieu"]');
+  await expect(page.locator('#toast')).toContainText('Position');
+  await expect(page.locator('[data-key="lieu"] input')).toHaveValue('');
 });
 
 test('11. aucun tiret cadratin ni demi-cadratin dans une note exportée', async ({ page }) => {

@@ -25,6 +25,7 @@ Site statique sans build, servi tel quel (GitHub Pages), sur le modèle de `julo
 | `js/model.js` | Règles sans DOM : options exclusives, maximum de choix, conditions, F7 depuis C1, grilles, statut |
 | `js/markdown.js` | Note Obsidian : frontmatter YAML, corps, bloc de reprise, nom de fichier |
 | `js/store.js` | Stockage sur l'appareil (IndexedDB, repli localStorage, copie de secours) |
+| `js/geo.js` | Position du téléphone pour préremplir le lieu (GPS de l'appareil, sans service tiers) |
 | `js/exporter.js` | Copie, téléchargement, partage natif, avec replis |
 | `sw.js`, `manifest.webmanifest` | Hors ligne et installation |
 | `test/` | Tests Node (`node --test`) |

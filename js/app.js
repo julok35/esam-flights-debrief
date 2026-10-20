@@ -4,7 +4,7 @@ import * as M from './model.js';
 import * as store from './store.js';
 import { toMarkdown, fileName, extractState } from './markdown.js';
 import { copyText, download, share } from './exporter.js';
-import { renderEntete, renderQuestion, renderRemarks, confirmButton } from './form.js';
+import { renderEntete, renderQuestion, renderRemarks, confirmButton, fillPosition } from './form.js';
 import { $, h, hm, dateTime, toast } from './util.js';
 import { APP_VERSION } from './version.js';
 
@@ -219,6 +219,9 @@ function newFiche() {
   store.draft(cur);
   flush().then(function () {
     go('#/f/' + encodeURIComponent(cur.debrief_id) + '/chaud');
+  });
+  q.entete.forEach(function (f) {
+    if (f.defaut === 'position') fillPosition(ctx, f.key, true);
   });
 }
 

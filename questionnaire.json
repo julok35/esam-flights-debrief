@@ -34,8 +34,8 @@
       "inputmode": "numeric"
     },
     { "key": "animaux", "type": "text", "l": "Nom des animaux", "aide": "Plusieurs : séparés par des virgules" },
-    { "key": "espece", "type": "text", "l": "Espèce" },
-    { "key": "lieu", "type": "text", "l": "Lieu" }
+    { "key": "espece", "type": "text", "l": "Espèce", "defaut": "Chien" },
+    { "key": "lieu", "type": "text", "l": "Lieu", "defaut": "position", "aide": "Position du téléphone par défaut, modifiable" }
   ],
   "titre_fiche": ["date", "animaux", "espece", "lieu"],
   "questions": [
