@@ -4,8 +4,8 @@ import * as M from './model.js';
 import * as store from './store.js';
 import { toMarkdown, fileName, extractState } from './markdown.js';
 import { copyText, download, share } from './exporter.js';
-import { renderEntete, renderQuestion, renderRemarks, confirmButton } from './form.js';
-import { $, h, frDate, hm, dateTime, toast } from './util.js';
+import { renderEntete, renderQuestion, renderRemarks, confirmButton, fillPosition } from './form.js';
+import { $, h, hm, dateTime, toast } from './util.js';
 import { APP_VERSION } from './version.js';
 
 var q = null;
@@ -156,7 +156,7 @@ function screen(nodes, title) {
 }
 
 function ficheTitle(f) {
-  return 'Fiche du ' + frDate(f.answers.date || f.cree) + (f.answers.patrouille ? ' - n° ' + f.answers.patrouille : '');
+  return M.ficheTitre(q, f);
 }
 
 /* ---------- Accueil ---------- */
@@ -182,7 +182,7 @@ function home() {
           h(
             'div',
             { class: 'card-h' },
-            h('strong', null, frDate(f.answers.date || f.cree)),
+            h('strong', { class: 'card-t' }, ficheTitle(f)),
             h('span', { class: 'badge s-' + f.statut }, M.statutLabel(q, f.statut))
           ),
           h(
@@ -219,6 +219,9 @@ function newFiche() {
   store.draft(cur);
   flush().then(function () {
     go('#/f/' + encodeURIComponent(cur.debrief_id) + '/chaud');
+  });
+  q.entete.forEach(function (f) {
+    if (f.defaut === 'position') fillPosition(ctx, f.key, true);
   });
 }
 

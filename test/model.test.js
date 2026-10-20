@@ -163,6 +163,13 @@ test('statut : à chaud en cours, à chaud fait, à froid en cours, terminé', (
   assert.equal(f.statut, 'termine');
 });
 
+test('nouvelle fiche : date du jour et espèce « Chien » par défaut, lieu laissé à la position du téléphone', () => {
+  var f = M.newFiche(q);
+  assert.equal(f.answers.date, M.today());
+  assert.equal(f.answers.espece, 'Chien');
+  assert.equal(f.answers.lieu, undefined);
+});
+
 test('les tirets typographiques saisis sont remplacés par le tiret classique', () => {
   var f = M.newFiche(q);
   M.setValue(q, f, 'f1_commentaire', 'a \u2013 b \u2014 c');

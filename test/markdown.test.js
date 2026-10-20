@@ -17,7 +17,8 @@ function fmOf(md) {
 
 /** Clés attendues : champs fixes, un champ par réponse fermée, une ligne de grille par champ. */
 function expectedKeys() {
-  var keys = ['type', 'debrief_id', 'questionnaire_version', 'app_version', 'statut', 'date', 'patrouille'];
+  var keys = ['type', 'debrief_id', 'questionnaire_version', 'app_version', 'statut', 'date', 'titre', 'patrouille'];
+  keys.push('animaux', 'espece', 'lieu');
   keys.push('role_saisie', 'date_maj', 'tags');
   q.questions.forEach((qu) => {
     qu.fields.forEach((f) => {
@@ -130,6 +131,26 @@ test("bloc de reprise : la fiche est restituée à l'identique", () => {
   assert.equal(toMarkdown(q, back), toMarkdown(q, f));
   assert.equal(extractState('# une note sans bloc'), null);
   assert.equal(extractState('%%\nesam-debrief-data:v1\n!!!\n%%'), null);
+});
+
+test('titre combiné : date, animaux, espèce, lieu', () => {
+  var f = M.newFiche(q);
+  M.setValue(q, f, 'date', '2026-10-19');
+  assert.equal(M.ficheTitre(q, f), '19/10/2026 - Chien', 'espèce par défaut');
+  M.setValue(q, f, 'espece', '');
+  assert.equal(M.ficheTitre(q, f), '19/10/2026');
+  M.setValue(q, f, 'animaux', ' Rex ,Max,, ');
+  M.setValue(q, f, 'lieu', 'Lac Blanc, Belledonne');
+  assert.equal(M.ficheTitre(q, f), '19/10/2026 - Rex, Max - Lac Blanc, Belledonne');
+  M.setValue(q, f, 'espece', 'Chien');
+  assert.equal(M.ficheTitre(q, f), '19/10/2026 - Rex, Max - Chien - Lac Blanc, Belledonne');
+  var md = toMarkdown(q, f);
+  var fm = fmOf(md);
+  assert.equal(fm.titre, '19/10/2026 - Rex, Max - Chien - Lac Blanc, Belledonne');
+  assert.deepEqual(fm.animaux, ['Rex', 'Max']);
+  assert.equal(fm.espece, 'Chien');
+  assert.equal(fm.lieu, 'Lac Blanc, Belledonne');
+  assert.ok(md.includes('\n# 19/10/2026 - Rex, Max - Chien - Lac Blanc, Belledonne\n'));
 });
 
 test('nom de fichier sans accents ni espaces', () => {

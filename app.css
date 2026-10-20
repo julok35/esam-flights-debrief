@@ -75,6 +75,8 @@ main:focus { outline: none; }
 .card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
 .card-h { display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: 1.1rem; }
 .card-m { margin: 0; color: var(--muted); }
+.card-t { overflow-wrap: anywhere; }
+.titre { margin: 0; padding: 8px 10px; border-radius: 8px; background: var(--soft); overflow-wrap: anywhere; }
 .badge { font-size: .85rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 2px solid var(--line); white-space: nowrap; }
 .badge.s-chaud-fait, .badge.s-froid-en-cours { border-color: var(--glacier); background: var(--soft); }
 .badge.s-termine { border-color: var(--ok); color: var(--ok); }
@@ -88,7 +90,7 @@ main:focus { outline: none; }
 /* Fiche */
 .fbar { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; }
 .fbar-t { display: grid; min-width: 0; }
-.fbar-t strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fbar-t strong { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow-wrap: anywhere; }
 .saved { font-size: .85rem; color: var(--muted); }
 .saved.err { color: var(--err); font-weight: 700; }
 .role-pill { min-height: 48px; padding: 0 12px; border-radius: 999px; border: 2px solid var(--fg); background: var(--surface); color: var(--fg); font: 700 .9rem var(--f-body); cursor: pointer; }

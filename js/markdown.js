@@ -5,6 +5,8 @@ import {
   fieldVisible,
   fieldLabel,
   nonEngage,
+  ficheTitre,
+  animauxList,
   optionsOf,
   gridState,
   gridFilled,
@@ -100,7 +102,11 @@ export function frontmatter(q, fiche) {
     app_version: APP_VERSION,
     statut: fiche.statut,
     date: a.date ? raw(a.date) : null,
+    titre: ficheTitre(q, fiche),
     patrouille: a.patrouille || null,
+    animaux: animauxList(fiche),
+    espece: a.espece || null,
+    lieu: a.lieu || null,
     role_saisie: fiche.role_saisie,
     date_maj: raw(fiche.maj.slice(0, 10)),
     tags: ['esam/debrief-drone']
@@ -160,10 +166,6 @@ export function toYaml(obj) {
 
 /* ---------- Corps ---------- */
 
-function frDate(iso) {
-  var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '');
-  return m ? m[3] + '/' + m[2] + '/' + m[1] : '';
-}
 // Texte libre : ni commentaire Obsidian ouvert par erreur, ni tiret typographique
 function safe(s) {
   return cleanText(s).replace(/%%/g, '% %');
@@ -311,7 +313,8 @@ export function extractState(text) {
 export function toMarkdown(q, fiche) {
   var a = fiche.answers;
   var lines = ['---', toYaml(frontmatter(q, fiche)), '---', ''];
-  lines.push('# Debrief drone du ' + frDate(a.date) + (a.patrouille ? " - Pat'rouille " + safe(a.patrouille) : ''), '');
+  lines.push('# ' + safe(ficheTitre(q, fiche)), '');
+  if (a.patrouille) lines.push("Pat'rouille : " + safe(a.patrouille), '');
   lines.push(
     '> ' +
       [
