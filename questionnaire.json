@@ -1,0 +1,721 @@
+{
+  "version": "2.0",
+  "titre": "Debrief des vols drone ESAM",
+  "roles": [
+    { "v": "pilote", "l": "Pilote" },
+    { "v": "copilote", "l": "Copilote" },
+    { "v": "auxiliaire", "l": "Auxiliaire" },
+    { "v": "autre", "l": "Autre" }
+  ],
+  "parcours": { "key": "c2", "nonEngage": "non-engage" },
+  "statuts": [
+    { "v": "chaud-en-cours", "l": "À chaud en cours" },
+    { "v": "chaud-fait", "l": "À chaud fait" },
+    { "v": "froid-en-cours", "l": "À froid en cours" },
+    { "v": "termine", "l": "Terminé" }
+  ],
+  "phases": [
+    { "id": "chaud", "l": "À chaud", "court": "À chaud", "temps": "chaud" },
+    { "id": "non-engage", "l": "Non engagé", "court": "Non engagé", "temps": "froid", "parcours": "non-engage" },
+    { "id": "preparation", "n": 1, "l": "Préparation", "court": "Prépa", "temps": "froid" },
+    { "id": "mise-en-place", "n": 2, "l": "Mise en place", "court": "Mise en place", "temps": "froid" },
+    { "id": "vol", "n": 3, "l": "Vol", "court": "Vol", "temps": "froid" },
+    { "id": "retour", "n": 4, "l": "Retour", "court": "Retour", "temps": "froid" },
+    { "id": "derushage", "n": 5, "l": "Dérushage", "court": "Dérushage", "temps": "froid" },
+    { "id": "analyse", "n": 6, "l": "Analyse", "court": "Analyse", "temps": "froid" }
+  ],
+  "entete": [
+    { "key": "date", "type": "date", "l": "Date de l'intervention", "defaut": "aujourdhui" },
+    {
+      "key": "patrouille",
+      "type": "text",
+      "l": "Numéro Pat'rouille",
+      "aide": "Facultatif à chaud",
+      "inputmode": "numeric"
+    }
+  ],
+  "questions": [
+    {
+      "id": "C1",
+      "phase": "chaud",
+      "titre": "« Y a-t-il eu un moment où le drone aurait pu être perdu ou percuter quelque chose ? »",
+      "usage": "Sécurité des vols",
+      "fields": [
+        {
+          "key": "c1",
+          "type": "single",
+          "options": [
+            { "v": "oui", "l": "Oui" },
+            { "v": "non", "l": "Non" }
+          ]
+        },
+        {
+          "key": "c1_categories",
+          "type": "multi",
+          "l": "Catégories",
+          "showIf": { "key": "c1", "eq": "oui" },
+          "options": [
+            { "v": "obstacle", "l": "Obstacle" },
+            { "v": "perte-liaison", "l": "Perte de liaison" },
+            { "v": "relief", "l": "Relief" },
+            { "v": "meteo", "l": "Météo" },
+            { "v": "tiers", "l": "Tiers" },
+            { "v": "energie", "l": "Énergie" },
+            { "v": "humain", "l": "Humain" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "phase": "chaud",
+      "titre": "« Qu'est-ce que le drone a apporté ? »",
+      "usage": "Efficacité de la recherche, financements, prospective",
+      "fields": [
+        {
+          "key": "c2",
+          "type": "multi",
+          "options": [
+            { "v": "localisation-animal", "l": "Localisation de l'animal" },
+            { "v": "levee-doute", "l": "Levée de doute" },
+            { "v": "reconnaissance-terrain", "l": "Reconnaissance du terrain" },
+            { "v": "voie-acces", "l": "Voie d'accès" },
+            { "v": "guidage-equipe", "l": "Guidage de l'équipe" },
+            { "v": "surveillance-animal", "l": "Surveillance de l'animal" },
+            { "v": "autre", "l": "Autre" },
+            { "v": "sans-apport", "l": "Sans apport", "exclusive": true },
+            { "v": "non-engage", "l": "Non engagé", "exclusive": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C3",
+      "phase": "chaud",
+      "parcours": "engage",
+      "titre": "Dernier indice reçu avant la localisation",
+      "aide": "Le dernier indice reçu avant la localisation. Les écarts sont des estimations de secours : l'écart de référence est calculé après coup quand les coordonnées sont disponibles.",
+      "usage": "Efficacité de la recherche",
+      "fields": [
+        {
+          "key": "c3_source",
+          "type": "single",
+          "l": "Source",
+          "clears": ["c3_aucun"],
+          "options": [
+            { "v": "collier-gps", "l": "Collier GPS" },
+            { "v": "requerant", "l": "Requérant" },
+            { "v": "temoin", "l": "Témoin" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        {
+          "key": "c3_ecart_h",
+          "type": "single",
+          "l": "Écart horizontal",
+          "clears": ["c3_aucun"],
+          "options": [
+            { "v": "moins-10m", "l": "Moins de 10 m" },
+            { "v": "10-30m", "l": "10 à 30 m" },
+            { "v": "30-100m", "l": "30 à 100 m" },
+            { "v": "100-500m", "l": "100 à 500 m" },
+            { "v": "plus-500m", "l": "Plus de 500 m" }
+          ]
+        },
+        {
+          "key": "c3_ecart_v",
+          "type": "single",
+          "l": "Écart vertical",
+          "clears": ["c3_aucun"],
+          "options": [
+            { "v": "moins-10m", "l": "Moins de 10 m" },
+            { "v": "10-30m", "l": "10 à 30 m" },
+            { "v": "30-100m", "l": "30 à 100 m" },
+            { "v": "plus-100m", "l": "Plus de 100 m" }
+          ]
+        },
+        {
+          "key": "c3_aucun",
+          "type": "flag",
+          "l": "Pas d'indice exploitable",
+          "clears": ["c3_source", "c3_ecart_h", "c3_ecart_v"]
+        }
+      ],
+      "derived": [
+        { "key": "c3_ecart_source", "value": "estime", "ifAny": ["c3_ecart_h", "c3_ecart_v"] },
+        { "key": "c3_ecart_h_calcule", "value": null },
+        { "key": "c3_ecart_v_calcule", "value": null }
+      ]
+    },
+    {
+      "id": "C4",
+      "phase": "chaud",
+      "parcours": "engage",
+      "titre": "« Qu'est-ce qui t'a le plus manqué avec le matériel actuel ? »",
+      "aide": "2 choix au maximum.",
+      "usage": "Matériel et financements",
+      "fields": [
+        {
+          "key": "c4",
+          "type": "multi",
+          "max": 2,
+          "options": [
+            { "v": "autonomie-energie", "l": "Autonomie et énergie" },
+            { "v": "portee-liaison", "l": "Portée et liaison" },
+            { "v": "capteur", "l": "Capteur (infrarouge, zoom, télémètre)" },
+            { "v": "ecran-deporte", "l": "Écran déporté" },
+            { "v": "protection-pluie-froid", "l": "Protection pluie et froid" },
+            { "v": "rien", "l": "Rien", "exclusive": true }
+          ]
+        },
+        { "key": "c4_commentaire", "type": "text", "multiline": true, "l": "Commentaire (facultatif)" }
+      ]
+    },
+    {
+      "id": "C5",
+      "phase": "chaud",
+      "parcours": "engage",
+      "titre": "Énergie restante",
+      "usage": "Matériel et financements",
+      "fields": [
+        {
+          "key": "c5_power2000",
+          "type": "slider",
+          "l": "Niveau de la Power 2000",
+          "min": 0,
+          "max": 100,
+          "step": 10,
+          "unit": "%",
+          "clears": ["c5_power2000_absente"]
+        },
+        {
+          "key": "c5_power2000_absente",
+          "type": "flag",
+          "l": "Pas emportée",
+          "clears": ["c5_power2000"]
+        },
+        {
+          "key": "c5_tb30",
+          "type": "counter",
+          "l": "Paires de batteries TB30 encore chargées et opérationnelles",
+          "min": 0,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "id": "NE1",
+      "phase": "non-engage",
+      "parcours": "non-engage",
+      "titre": "« Pourquoi le drone n'a-t-il pas volé ? »",
+      "fields": [
+        {
+          "key": "ne1",
+          "type": "multi",
+          "options": [
+            { "v": "meteo", "l": "Météo" },
+            { "v": "reglementation", "l": "Réglementation (zone interdite, hélistation, autorisation)" },
+            { "v": "materiel-indisponible", "l": "Matériel indisponible ou en panne" },
+            { "v": "pas-telepilote", "l": "Pas de télépilote disponible" },
+            { "v": "pas-necessaire", "l": "Pas nécessaire" },
+            { "v": "contre-indique", "l": "Contre-indiqué (risque pour l'équipe ou l'animal, hélicoptère en vol)" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        { "key": "ne1_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F1",
+      "phase": "preparation",
+      "parcours": "engage",
+      "titre": "« Au moment du départ, le matériel était-il prêt et complet ? »",
+      "fields": [
+        {
+          "key": "f1",
+          "type": "multi",
+          "options": [
+            { "v": "tout-pret", "l": "Tout était prêt", "exclusive": true },
+            { "v": "batteries-pas-chargees", "l": "Batteries pas toutes chargées" },
+            { "v": "power2000-pas-pleine", "l": "Power 2000 pas pleine" },
+            { "v": "carte-sd", "l": "Carte SD pleine ou absente" },
+            { "v": "mise-a-jour", "l": "Mise à jour à faire au départ (drone ou radiocommande)" },
+            { "v": "element-oublie", "l": "Élément oublié ou manquant" },
+            { "v": "materiel-abime", "l": "Matériel abîmé ou douteux" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        { "key": "f1_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F2",
+      "phase": "preparation",
+      "parcours": "engage",
+      "titre": "« Avant de partir, qu'est-ce qui manquait dans les informations reçues pour préparer le vol ? »",
+      "fields": [
+        {
+          "key": "f2",
+          "type": "multi",
+          "options": [
+            { "v": "rien", "l": "Rien, tout était là", "exclusive": true },
+            { "v": "coordonnees", "l": "Coordonnées exploitables (format, conversion)" },
+            { "v": "zone-recherche", "l": "Zone de recherche délimitée" },
+            { "v": "acces-rdv", "l": "Accès véhicule et point de rendez-vous" },
+            { "v": "description-animal", "l": "Description ou photo de l'animal" },
+            { "v": "collier-gps", "l": "Présence d'un collier GPS et moyen d'y accéder" },
+            { "v": "contact-requerant", "l": "Contact du requérant sur place" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        { "key": "f2_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F3",
+      "phase": "preparation",
+      "parcours": "engage",
+      "titre": "« Ta préparation de pilote a-t-elle pu être faite avant le décollage ? »",
+      "fields": [
+        {
+          "key": "f3",
+          "type": "single",
+          "options": [
+            { "v": "complete", "l": "Complète" },
+            { "v": "partielle", "l": "Partielle" },
+            { "v": "pas-faite", "l": "Pas faite" }
+          ]
+        },
+        {
+          "key": "f3_manque",
+          "type": "multi",
+          "l": "Ce qui manquait",
+          "showIf": { "key": "f3", "in": ["partielle", "pas-faite"] },
+          "options": [
+            { "v": "zones-aeriennes", "l": "Zones aériennes et autorisations" },
+            { "v": "meteo", "l": "Météo" },
+            { "v": "relief-obstacles", "l": "Relief et obstacles sur carte" },
+            { "v": "plan-vol", "l": "Plan de vol" }
+          ]
+        },
+        {
+          "key": "f3_pourquoi",
+          "type": "multi",
+          "l": "Pourquoi",
+          "showIf": { "key": "f3", "in": ["partielle", "pas-faite"] },
+          "options": [
+            { "v": "manque-temps", "l": "Manque de temps" },
+            { "v": "pas-reseau", "l": "Pas de réseau" },
+            { "v": "outil-indisponible", "l": "Outil indisponible" },
+            { "v": "manque-information", "l": "Manque d'information" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F4",
+      "phase": "mise-en-place",
+      "parcours": "engage",
+      "titre": "« Depuis le point de décollage, quelle vue directe avais-tu sur la zone de recherche ? »",
+      "fields": [
+        {
+          "key": "f4",
+          "type": "single",
+          "options": [
+            { "v": "totale", "l": "Totale" },
+            { "v": "partielle", "l": "Partielle" },
+            { "v": "nulle", "l": "Nulle" }
+          ]
+        },
+        {
+          "key": "f4_masque",
+          "type": "multi",
+          "l": "Ce qui masquait",
+          "showIf": { "key": "f4", "in": ["partielle", "nulle"] },
+          "options": [
+            { "v": "crete", "l": "Crête" },
+            { "v": "foret", "l": "Forêt" },
+            { "v": "paroi", "l": "Paroi" },
+            { "v": "brouillard-nuages", "l": "Brouillard ou nuages" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F5",
+      "phase": "mise-en-place",
+      "parcours": "engage",
+      "titre": "Choix du point de décollage et repositionnements",
+      "fields": [
+        {
+          "key": "f5_choix",
+          "type": "single",
+          "l": "« Comment le point de décollage initial a-t-il été choisi ? »",
+          "options": [
+            { "v": "analyse-relief", "l": "Choisi en analysant le relief (carte ou terrain)" },
+            { "v": "commodite", "l": "Choisi par commodité (parking, accès, proximité de l'équipe)" },
+            { "v": "impose", "l": "Imposé (accès, sécurité, chef d'intervention)" },
+            { "v": "pas-de-choix", "l": "Pas de choix (décollage là où on est arrivé)" }
+          ]
+        },
+        {
+          "key": "f5_repositionne",
+          "type": "single",
+          "l": "« T'es-tu repositionné en cours de mission ? »",
+          "options": [
+            { "v": "non", "l": "Non" },
+            { "v": "oui", "l": "Oui" }
+          ]
+        },
+        {
+          "key": "f5_nb",
+          "type": "counter",
+          "l": "Nombre de repositionnements",
+          "min": 1,
+          "max": 20,
+          "showIf": { "key": "f5_repositionne", "eq": "oui" }
+        },
+        {
+          "key": "f5_pourquoi",
+          "type": "multi",
+          "l": "Pourquoi",
+          "showIf": { "key": "f5_repositionne", "eq": "oui" },
+          "options": [
+            { "v": "perte-liaison", "l": "Perte ou dégradation de la liaison" },
+            { "v": "vue-masquee", "l": "Vue masquée" },
+            { "v": "zone-deplacee", "l": "Zone de recherche déplacée" },
+            { "v": "rapprochement", "l": "Rapprochement de l'animal ou de l'équipe" },
+            { "v": "securite", "l": "Sécurité" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        {
+          "key": "f5_resolu",
+          "type": "single",
+          "l": "« Le nouveau point a-t-il résolu le problème ? »",
+          "showIf": { "key": "f5_repositionne", "eq": "oui" },
+          "options": [
+            { "v": "oui", "l": "Oui" },
+            { "v": "en-partie", "l": "En partie" },
+            { "v": "non", "l": "Non" }
+          ]
+        },
+        {
+          "key": "f5_meilleur",
+          "type": "single",
+          "l": "« Avec du recul, un meilleur point initial existait-il ? »",
+          "options": [
+            { "v": "oui", "l": "Oui" },
+            { "v": "non", "l": "Non" }
+          ]
+        },
+        { "key": "f5_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F6",
+      "phase": "mise-en-place",
+      "parcours": "engage",
+      "titre": "Grille des conditions du poste de pilotage",
+      "fields": [
+        {
+          "key": "f6",
+          "type": "grid",
+          "values": [
+            { "v": "bien", "l": "Bien" },
+            { "v": "neutre", "l": "Neutre" },
+            { "v": "pas-bien", "l": "Pas bien" }
+          ],
+          "defaut": "neutre",
+          "rows": [
+            { "v": "acces-portage", "l": "Accès et portage" },
+            { "v": "surface", "l": "Surface de décollage (neige, boue, herbe haute, mouillée)" },
+            { "v": "pente", "l": "Pente ou irrégularités" },
+            { "v": "obstacles", "l": "Obstacles (arbres, câbles, rochers autour du point)" },
+            { "v": "abri", "l": "Abri (pluie, vent)" },
+            { "v": "temperature", "l": "Température (pilote et matériel)" },
+            { "v": "lisibilite-ecran", "l": "Lisibilité de l'écran (soleil, reflets)" },
+            { "v": "eclairage", "l": "Éclairage (nuit, pénombre)" },
+            { "v": "reseau", "l": "Réseau (RTK, FlightHub)" },
+            { "v": "tiers", "l": "Tiers" }
+          ]
+        },
+        { "key": "f6_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F7",
+      "phase": "vol",
+      "parcours": "engage",
+      "titre": "Détail de chaque quasi-incident",
+      "aide": "Une fiche par catégorie cochée à chaud en C1. Le bouton « Ajouter » sert pour ce qui n'a pas été vu sur le moment.",
+      "fields": [
+        {
+          "key": "f7",
+          "type": "repeat",
+          "seedFrom": "c1_categories",
+          "seedKey": "categorie",
+          "itemLabel": "Quasi-incident",
+          "addLabel": "Ajouter un quasi-incident",
+          "fields": [
+            { "key": "categorie", "type": "single", "l": "Catégorie", "optionsFrom": "c1_categories" },
+            { "key": "faits", "type": "text", "multiline": true, "l": "Faits (sans interprétation)" },
+            {
+              "key": "moment",
+              "type": "single",
+              "l": "Moment",
+              "options": [
+                { "v": "decollage", "l": "Décollage" },
+                { "v": "transit", "l": "Transit" },
+                { "v": "recherche", "l": "Recherche" },
+                { "v": "retour", "l": "Retour" },
+                { "v": "atterrissage", "l": "Atterrissage" }
+              ]
+            },
+            {
+              "key": "evite",
+              "type": "multi",
+              "l": "Ce qui a évité l'accident",
+              "options": [
+                { "v": "vigilance-pilote", "l": "Vigilance du pilote" },
+                { "v": "alerte-equipier", "l": "Alerte d'un équipier" },
+                { "v": "rth", "l": "RTH automatique" },
+                { "v": "anticollision", "l": "Capteurs anticollision" },
+                { "v": "chance", "l": "Chance" },
+                { "v": "autre", "l": "Autre" }
+              ]
+            },
+            {
+              "key": "gravite",
+              "type": "single",
+              "l": "Gravité potentielle",
+              "options": [
+                { "v": "dommage-leger", "l": "Dommage léger" },
+                { "v": "perte-drone", "l": "Perte du drone" },
+                { "v": "danger-personne", "l": "Danger pour une personne" }
+              ]
+            },
+            { "key": "cause_immediate", "type": "text", "l": "Cause immédiate" },
+            { "key": "cause_racine", "type": "text", "l": "Cause racine" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F8",
+      "phase": "vol",
+      "parcours": "engage",
+      "titre": "Grille du matériel",
+      "fields": [
+        {
+          "key": "f8",
+          "type": "grid",
+          "values": [
+            { "v": "bien", "l": "Bien" },
+            { "v": "neutre", "l": "Neutre" },
+            { "v": "pas-bien", "l": "Pas bien" },
+            { "v": "non-utilise", "l": "Non utilisé" }
+          ],
+          "defaut": "neutre",
+          "observer": "pas-bien",
+          "rows": [
+            { "v": "infrarouge", "l": "Infrarouge", "defaut": "non-utilise" },
+            { "v": "zoom", "l": "Zoom", "defaut": "non-utilise" },
+            { "v": "telemetre", "l": "Télémètre et PinPoint", "defaut": "non-utilise" },
+            { "v": "liaison", "l": "Liaison vidéo et commande" },
+            { "v": "etancheite", "l": "Étanchéité" },
+            { "v": "hot-swap", "l": "Hot swap des batteries" },
+            { "v": "ecran-rc", "l": "Écran de la RC Plus" },
+            { "v": "autonomie", "l": "Autonomie" }
+          ],
+          "prefill": [
+            { "from": "c4", "has": "autonomie-energie", "row": "autonomie", "value": "pas-bien" },
+            { "from": "c4", "has": "portee-liaison", "row": "liaison", "value": "pas-bien" }
+          ],
+          "highlight": [
+            { "from": "c4", "has": "capteur", "rows": ["infrarouge", "zoom", "telemetre"] },
+            { "from": "c4", "has": "protection-pluie-froid", "rows": ["etancheite"] }
+          ]
+        },
+        { "key": "f8_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F9",
+      "phase": "vol",
+      "parcours": "engage",
+      "titre": "« Qu'est-ce que le drone a changé dans cette intervention ? »",
+      "fields": [
+        {
+          "key": "f9_effets",
+          "type": "multi",
+          "l": "Effets",
+          "options": [
+            { "v": "temps-gagne", "l": "Temps gagné" },
+            { "v": "risque-evite", "l": "Risque évité pour l'équipe ou les cordistes" },
+            { "v": "zone-ecartee", "l": "Zone écartée sans y envoyer personne" },
+            { "v": "itineraire", "l": "Itinéraire plus sûr ou plus court" },
+            { "v": "stress-animal", "l": "Stress de l'animal limité" },
+            { "v": "decision-rapide", "l": "Décision prise plus vite (engager, arrêter, changer de zone)" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        {
+          "key": "f9_gain",
+          "type": "single",
+          "l": "Gain de temps total",
+          "options": [
+            { "v": "aucun", "l": "Aucun" },
+            { "v": "moins-30min", "l": "Moins de 30 min" },
+            { "v": "30min-1h", "l": "30 min à 1 h" },
+            { "v": "plus-1h", "l": "Plus de 1 h" },
+            { "v": "impossible-a-dire", "l": "Impossible à dire" }
+          ]
+        },
+        { "key": "f9_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F10",
+      "phase": "vol",
+      "parcours": "engage",
+      "titre": "« Le pilote était-il secondé ? »",
+      "fields": [
+        {
+          "key": "f10",
+          "type": "single",
+          "options": [
+            { "v": "oui", "l": "Oui" },
+            { "v": "non-preferable", "l": "Non, mais ça aurait été préférable" },
+            { "v": "non-pas-indispensable", "l": "Non, et ce n'était pas indispensable" }
+          ]
+        },
+        {
+          "key": "f10_taches",
+          "type": "multi",
+          "showIf": { "key": "f10", "in": ["oui", "non-preferable"] },
+          "labelIf": [
+            { "key": "f10", "eq": "oui", "l": "« Quelles tâches le second a-t-il couvertes ? »" },
+            { "key": "f10", "eq": "non-preferable", "l": "« Quelles tâches auraient dû être couvertes ? »" }
+          ],
+          "options": [
+            { "v": "analyse-image", "l": "Analyse de l'image (infrarouge, zoom)" },
+            { "v": "vue-directe", "l": "Vue directe sur le drone et surveillance de l'espace aérien" },
+            { "v": "liaison-radio", "l": "Liaison radio avec l'équipe ou la régulation" },
+            { "v": "batteries", "l": "Gestion des batteries et du hot swap" },
+            { "v": "navigation", "l": "Navigation (carte, coordonnées, PinPoint)" },
+            { "v": "tiers-requerant", "l": "Gestion des tiers et du requérant" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        { "key": "f10_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F11",
+      "phase": "retour",
+      "parcours": "engage",
+      "titre": "« Au retour, as-tu constaté un dommage ou une anomalie sur le matériel ? »",
+      "fields": [
+        {
+          "key": "f11",
+          "type": "multi",
+          "options": [
+            { "v": "rien", "l": "Rien", "exclusive": true },
+            { "v": "helice", "l": "Hélice abîmée" },
+            { "v": "choc-rayure", "l": "Choc ou rayure" },
+            { "v": "humidite", "l": "Humidité ou condensation" },
+            { "v": "batterie-anormale", "l": "Batterie anormale (gonflement, chauffe, autonomie)" },
+            { "v": "nacelle-optique", "l": "Nacelle ou optique" },
+            { "v": "radiocommande", "l": "Radiocommande" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        { "key": "f11_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
+      ]
+    },
+    {
+      "id": "F12",
+      "phase": "derushage",
+      "parcours": "engage",
+      "titre": "Volume enregistré par le drone",
+      "aide": "Drone uniquement, pas les smartphones.",
+      "usage": "Dimensionner les cartes SD et le futur boîtier de sauvegarde terrain",
+      "fields": [
+        { "key": "f12_volume", "type": "slider", "l": "Volume enregistré", "min": 0, "max": 512, "step": 8, "unit": "Go" }
+      ]
+    },
+    {
+      "id": "F13",
+      "phase": "analyse",
+      "parcours": "engage",
+      "titre": "« Avec du recul, qu'est-ce qui aurait le plus accéléré la recherche ? »",
+      "fields": [
+        {
+          "key": "f13_levier",
+          "type": "single",
+          "l": "Levier principal",
+          "options": [
+            { "v": "information", "l": "Information (indice plus tôt ou plus précis, questions au requérant)" },
+            { "v": "engagement", "l": "Engagement (déclenchement, délai d'arrivée)" },
+            { "v": "technique", "l": "Technique de recherche (zone prioritaire, fenêtre horaire)" },
+            { "v": "materiel", "l": "Matériel (capteur, autonomie, capacité absente)" },
+            { "v": "organisation", "l": "Organisation (rôles, coordination avec l'équipe au sol)" },
+            { "v": "rien", "l": "Rien, la recherche a été menée au mieux" }
+          ]
+        },
+        {
+          "key": "f13_maitrisable",
+          "type": "single",
+          "l": "Maîtrisable par l'ESAM",
+          "options": [
+            { "v": "oui", "l": "Oui" },
+            { "v": "en-partie", "l": "En partie" },
+            { "v": "non", "l": "Non" }
+          ]
+        },
+        { "key": "f13_commentaire", "type": "text", "multiline": true, "l": "Ce qui aurait concrètement accéléré" }
+      ]
+    },
+    {
+      "id": "F14",
+      "phase": "analyse",
+      "titre": "Prospective",
+      "fields": [
+        {
+          "key": "f14",
+          "type": "multi",
+          "l": "« Quelle capacité, aujourd'hui absente, aurait servi sur cette intervention ? »",
+          "options": [
+            { "v": "largage-treuil", "l": "Largage ou treuil" },
+            { "v": "eclairage", "l": "Éclairage embarqué" },
+            { "v": "haut-parleur", "l": "Haut-parleur" },
+            { "v": "relais-garmin", "l": "Relais des colliers Garmin" },
+            { "v": "cartographie", "l": "Cartographie (photogrammétrie, lidar)" },
+            { "v": "livestream", "l": "Livestream vers la régulation" },
+            { "v": "relais-radio", "l": "Relais radio ou Meshtastic" },
+            { "v": "vol-nuit", "l": "Vol de nuit" },
+            { "v": "second-drone", "l": "Second drone" },
+            { "v": "autre", "l": "Autre" },
+            { "v": "aucune", "l": "Aucune", "exclusive": true }
+          ]
+        },
+        {
+          "key": "f14_issue",
+          "type": "perOption",
+          "source": "f14",
+          "l": "« Aurait-elle changé l'issue ? »",
+          "options": [
+            { "v": "oui", "l": "Oui" },
+            { "v": "peut-etre", "l": "Peut-être" },
+            { "v": "non", "l": "Non" }
+          ]
+        },
+        { "key": "f14_test", "type": "text", "multiline": true, "l": "Test ou nouvel usage à essayer" }
+      ]
+    }
+  ]
+}

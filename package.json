@@ -1,0 +1,23 @@
+{
+  "name": "esam-flights-debrief",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Debrief des vols drone de l'ESAM : appli web hors ligne, export Markdown pour Obsidian (site statique, sans build).",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "test": "node --test \"test/*.test.js\"",
+    "test:e2e": "playwright test",
+    "lint": "eslint .",
+    "format": "prettier --write \"js/**/*.js\" sw.js \"test/**/*.js\" \"e2e/**/*.js\" \"scripts/**/*.js\" eslint.config.js playwright.config.js",
+    "format:check": "prettier --check \"js/**/*.js\" sw.js \"test/**/*.js\" \"e2e/**/*.js\" \"scripts/**/*.js\" eslint.config.js playwright.config.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.56.1",
+    "eslint": "10.13.0",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "yaml": "2.9.1"
+  }
+}
