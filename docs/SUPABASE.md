@@ -104,6 +104,6 @@ son frontmatter : les réponses fermées sont retrouvées, pas les textes libres
 | « Ton adresse n'est pas encore dans la liste des membres » | Ajouter l'adresse dans `membres` (étape 3), en minuscules. |
 | « La table des fiches est absente » | Relancer le script SQL (étape 2). |
 | « Code incorrect ou expiré » | Le code vaut une heure et une seule fois : en demander un nouveau. |
-| « Trop de demandes » | Limite d'envoi d'e-mails atteinte : attendre, ou configurer un SMTP. |
+| « Limite d'envoi d'e-mails atteinte » | Sans SMTP personnel, Supabase envoie 2 e-mails par heure pour tout le projet : attendre une heure, ou configurer un SMTP (la limite se règle alors dans Authentication, Rate Limits). |
 | « Lien de connexion refusé » | Lien déjà utilisé ou expiré, ou adresse de l'appli absente des Redirect URLs (étape 4). |
 | « Session expirée : reconnecte-toi » | Session révoquée (déconnexion ailleurs, projet réinitialisé) : se reconnecter. |

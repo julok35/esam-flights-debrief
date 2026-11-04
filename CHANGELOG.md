@@ -2,6 +2,10 @@
 
 Versions de l'appli (semver). La version du questionnaire est suivie à part (`questionnaire.json`, champ `version`) ; les deux figurent dans chaque note exportée.
 
+## 1.3.3 - 2026-11-04
+
+- Connexion : message clair quand la limite d'envoi d'e-mails de Supabase est atteinte (2 par heure pour tout le projet sans serveur d'envoi personnel), au lieu de « attends une minute ».
+
 ## 1.3.2 - 2026-11-04
 
 - Connexion : le lien de l'e-mail devient la voie principale (Supabase n'ajoute le code à l'e-mail qu'avec un serveur d'envoi personnel). Le champ du code reste disponible pour un e-mail qui en contient un.

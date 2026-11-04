@@ -147,7 +147,11 @@ function fakeSupabase() {
       });
     db.calls.push(req.method() + ' ' + u.pathname);
     if (req.headers()['apikey'] !== 'cle-publique') return json(401, { message: 'Invalid API key' });
-    if (u.pathname === '/auth/v1/otp') return json(200, {});
+    if (u.pathname === '/auth/v1/otp') {
+      if (db.limite)
+        return json(429, { code: 429, error_code: 'over_email_send_rate_limit', msg: 'email rate limit exceeded' });
+      return json(200, {});
+    }
     if (u.pathname === '/auth/v1/verify') {
       var b = req.postDataJSON();
       if (b.token !== '123456') return json(403, { msg: 'Token has expired or is invalid' });
@@ -197,7 +201,7 @@ async function device(browser, sb) {
   return { ctx, page };
 }
 
-async function connect(page) {
+async function connect(page, sb) {
   await page.goto('/');
   await expect(page.locator('#syncState')).toContainText('non activée');
   await page.click('#accountBtn');
@@ -210,6 +214,10 @@ async function connect(page) {
   await page.fill('#cloudUrl', URL_SB + '/');
   await page.click('#cloudSave');
   await page.fill('#cloudEmail', 'Pilote@ESAM.test');
+  sb.db.limite = true;
+  await page.click('#sendCode');
+  await expect(page.locator('#cloudMsg')).toContainText('2 e-mails par heure');
+  sb.db.limite = false;
   await page.click('#sendCode');
   await expect(page.locator('#cloudMsg')).toContainText('E-mail envoyé à pilote@esam.test');
   await page.fill('#cloudCode', '000000');
@@ -228,8 +236,8 @@ test('synchronisation : une fiche saisie sur un appareil arrive sur l’autre, m
   var sb = fakeSupabase();
   var a = await device(browser, sb);
   var b = await device(browser, sb);
-  await connect(a.page);
-  await connect(b.page);
+  await connect(a.page, sb);
+  await connect(b.page, sb);
 
   // Appareil A : nouvelle fiche
   await a.page.click('#homeBtn');

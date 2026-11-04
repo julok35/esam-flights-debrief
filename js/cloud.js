@@ -83,7 +83,9 @@ function errMsg(status, body, path) {
   if (status === 0) return 'Pas de réseau : la synchronisation reprendra plus tard.';
   if (/^\/auth\/v1\/verify/.test(p) && (status === 400 || status === 403 || /expired|invalid/i.test(raw)))
     return 'Code incorrect ou expiré : demandes-en un nouveau.';
-  if (status === 429) return 'Trop de demandes : attends une minute avant de réessayer.';
+  if (status === 429 && (b.error_code === 'over_email_send_rate_limit' || /email rate limit/i.test(raw)))
+    return "Limite d'envoi d'e-mails atteinte : sans serveur d'envoi personnel, Supabase n'envoie que 2 e-mails par heure pour tout le projet. Réessaie dans une heure, ou configure un serveur d'envoi (docs/SUPABASE.md).";
+  if (status === 429) return 'Trop de demandes : attends quelques minutes avant de réessayer.';
   if (/^\/rest\//.test(p) && (b.code === '42501' || status === 403))
     return "Accès refusé : ton adresse n'est pas encore dans la liste des membres (table membres, voir docs/SUPABASE.md).";
   if (b.code === '42P01' || /relation .* does not exist|schema cache/i.test(raw))
