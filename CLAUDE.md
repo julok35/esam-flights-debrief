@@ -8,7 +8,7 @@ Appli de debrief des vols drone de l'ESAM. Référence fonctionnelle : `docs/ESA
 - **Typographie** : aucun tiret cadratin (U+2014) ni demi-cadratin (U+2013), nulle part (code, interface, notes exportées, noms de fichiers, documentation). Tiret classique (-) uniquement. Vérifié par `test/repo.test.js` et par les tests e2e. Attention : certains outils d'édition transforment l'échappement `\u2014` écrit dans un fichier en vrai caractère ; relancer `npm test` après chaque modification.
 - **Questionnaire** : validé question par question avec le responsable. Ne pas ajouter, retirer ni reformuler une question sans sa validation. Il est décrit dans `questionnaire.json` uniquement, séparé du moteur (`js/form.js`, `js/model.js`).
 - **Pas de dépendance chargée à l'exécution depuis un CDN** : tout est dans le dépôt (polices dans `vendor/fonts/`). Les `devDependencies` (lint, tests) ne sont jamais chargées par l'appli.
-- **Aucune donnée ne quitte l'appareil** sauf export volontaire. Pas d'outil d'analyse d'audience.
+- **Aucune donnée ne quitte l'appareil** sauf export volontaire, ou synchronisation Supabase une fois l'utilisateur connecté (`js/cloud.js`, `docs/SUPABASE.md`). Sans connexion, aucune requête hors de l'appli (vérifié par les tests e2e). Pas d'outil d'analyse d'audience. Pas de bibliothèque Supabase : appels REST directs.
 - **Aucun dialogue natif** (`alert`, `confirm`, `prompt`) : confirmations intégrées à la page.
 
 ## Charte ESAM
@@ -32,6 +32,7 @@ npm run lint        # ESLint
 npm run format      # Prettier
 npm test            # tests Node (règles, export, dépôt)
 npm run test:e2e    # Playwright, Chromium (critères d'acceptation de la section 11)
+                    # navigateur installé ailleurs : PW_CHROMIUM=/chemin/vers/chromium npm run test:e2e
 ```
 
 ## Points à confirmer (section 13 du cahier des charges)

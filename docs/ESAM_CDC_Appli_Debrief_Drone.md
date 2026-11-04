@@ -1,7 +1,7 @@
 ---
 titre: Cahier des charges - Appli de debrief des vols drone ESAM
-version: 0.1
-date_maj: 2026-10-19
+version: 0.2
+date_maj: 2026-11-04
 statut: Brouillon
 responsable: Julien de Feydeau
 questionnaire_version: 2.0
@@ -49,10 +49,15 @@ Les réponses servent quatre usages, par ordre de priorité :
 - Gestion de plusieurs fiches sur l'appareil, reprise et complément d'une fiche.
 - Export d'une note Markdown compatible Obsidian, et réimport de cette note pour compléter la fiche sur un autre appareil.
 - Fonctionnement hors ligne.
+- *Ajouts v0.2 (décision du responsable du 2026-11-04)* :
+  - historique des debriefs : recherche, filtres par état et par année, tri, consultation d'une fiche en lecture ;
+  - statistiques sur les debriefs (indicateurs clés, debriefs par mois, répartition des réponses de chaque question fermée) ;
+  - import groupé de notes Obsidian déjà exportées (plusieurs fichiers ou un dossier) ;
+  - synchronisation facultative entre appareils, par une base Supabase (section 4).
 
 **Hors périmètre (v1)**
 
-- Pas de serveur, pas de compte, pas de synchronisation en ligne entre appareils.
+- ~~Pas de serveur, pas de compte, pas de synchronisation en ligne entre appareils.~~ Levé en v0.2 : synchronisation facultative par Supabase, l'appli restant entièrement utilisable sans compte.
 - Pas de ressaisie des données Pat'rouille (requérant, animal, chronologie, issue) ni Airdata (vols, durées, trajectoires, batteries par vol, alertes).
 - Pas de calcul dans l'appli à partir des logs Airdata : ce post-traitement est fait par Claude, hors appli (section 9).
 - Pas de nom de personne : uniquement des rôles.
@@ -62,7 +67,8 @@ Les réponses servent quatre usages, par ordre de priorité :
 - **Application web statique**, hébergée sur GitHub Pages, sur le modèle du dépôt existant `julok35/esam-gps`.
 - **PWA hors ligne** : manifest et service worker. Après une première ouverture avec réseau, l'appli doit s'ouvrir et fonctionner entièrement sans réseau, et être installable sur l'écran d'accueil.
 - **Pas de framework lourd.** HTML, CSS et JavaScript simples, ou un outillage léger si justifié. Aucune dépendance chargée à l'exécution depuis un CDN : tout est embarqué dans le dépôt pour garantir le hors ligne.
-- **Stockage local** : IndexedDB, ou localStorage avec gestion d'erreur. Aucune donnée ne quitte l'appareil, sauf par export volontaire de l'utilisateur.
+- **Stockage local** : IndexedDB, ou localStorage avec gestion d'erreur. Aucune donnée ne quitte l'appareil, sauf par export volontaire de l'utilisateur ou par la synchronisation, une fois que l'utilisateur l'a activée en se connectant.
+- **Synchronisation (v0.2)** : base Supabase hébergée en Europe, appelée directement par ses API REST, sans bibliothèque. Connexion sans mot de passe (code à usage unique ou lien reçu par e-mail). Tous les membres voient et modifient toutes les fiches ; un membre est une adresse de la table `membres`, protégée par les règles d'accès de la base (RLS). L'appareil reste la référence : saisie hors ligne, recopie dans les deux sens dès que le réseau revient, la fiche modifiée en dernier l'emporte, une suppression est transmise aux autres appareils. Mise en place : `docs/SUPABASE.md`.
 - **Export** :
   - copie dans le presse-papiers ;
   - téléchargement du fichier .md ;
@@ -78,12 +84,15 @@ Les réponses servent quatre usages, par ordre de priorité :
 
 ### 5.1 Écran d'accueil
 
-- Liste des fiches enregistrées sur l'appareil. Pour chaque fiche : date, numéro Pat'rouille, statut (à chaud fait, à froid en cours, terminé), dernière modification.
+- Liste des fiches enregistrées sur l'appareil (et synchronisées, le cas échéant). Pour chaque fiche : titre, numéro Pat'rouille, statut (à chaud fait, à froid en cours, terminé), résumé (engagement, apport, quasi-incident), dernière modification.
+- Recherche (sans tenir compte des accents ni des majuscules, y compris dans les textes libres), filtres par état et par année, tri par date d'intervention ou par dernière modification.
+- Accès aux statistiques et à la synchronisation, état de la synchronisation.
 - Actions :
   - nouvelle fiche ;
+  - consulter (note affichée en lecture) ;
   - ouvrir ;
   - supprimer, avec confirmation intégrée à la page, sans dialogue natif ;
-  - reprendre une note Obsidian, par collage du texte ou ouverture d'un fichier .md.
+  - importer des notes Obsidian : collage du texte, un ou plusieurs fichiers .md, ou un dossier. Pour une seule note, choix entre remplacer et ignorer si la fiche existe ; pour plusieurs, la version la plus récente de chaque fiche est gardée, puis un bilan s'affiche. Une note de l'appli dont le bloc de reprise a disparu est reprise depuis son frontmatter (réponses fermées seulement).
 
 ### 5.2 Debrief à chaud
 
@@ -363,3 +372,4 @@ Tests automatisés (Playwright, navigateur Chromium) au minimum :
 | Version | Date | Changements |
 |---|---|---|
 | 0.1 | 2026-10-19 | Création à partir du questionnaire v2.0 validé question par question. |
+| 0.2 | 2026-11-04 | Historique, statistiques, import groupé de notes Obsidian, synchronisation facultative entre appareils (Supabase). Questionnaire inchangé. |

@@ -1,6 +1,6 @@
 /* Service worker Debrief drone ESAM : toute l'appli en cache à l'installation, servie depuis le cache (le terrain est
  * souvent sans réseau). Nouvelle version de l'appli : nouveau nom de cache, l'ancien est supprimé. */
-var V = 'esam-debrief-v1.2.0';
+var V = 'esam-debrief-v1.3.1';
 var SHELL = [
   './',
   'index.html',
@@ -13,14 +13,21 @@ var SHELL = [
   'icon-maskable-192.png',
   'icon-maskable-512.png',
   'js/app.js',
+  'js/cloud.js',
+  'js/config.js',
   'js/exporter.js',
   'js/form.js',
   'js/geo.js',
+  'js/history.js',
+  'js/importer.js',
   'js/markdown.js',
   'js/model.js',
+  'js/stats.js',
   'js/store.js',
+  'js/sync.js',
   'js/util.js',
   'js/version.js',
+  'js/view.js',
   'vendor/fonts/fonts.css',
   'vendor/fonts/anton-latin.woff2',
   'vendor/fonts/anton-latin-ext.woff2',
@@ -65,7 +72,7 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-// Cache d'abord : versions cohérentes entre fichiers, ouverture instantanée sans réseau. Les mises à jour arrivent
+// Cache d'abord (appli seulement : les appels à Supabase, d'une autre origine, passent directement au réseau) : versions cohérentes entre fichiers, ouverture instantanée sans réseau. Les mises à jour arrivent
 // avec un nouveau sw.js (nouveau V), que le navigateur vérifie à chaque ouverture avec du réseau.
 self.addEventListener('fetch', function (e) {
   var req = e.request;

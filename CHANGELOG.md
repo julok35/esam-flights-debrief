@@ -2,6 +2,21 @@
 
 Versions de l'appli (semver). La version du questionnaire est suivie à part (`questionnaire.json`, champ `version`) ; les deux figurent dans chaque note exportée.
 
+## 1.3.1 - 2026-11-04
+
+- Projet Supabase de l'ESAM branché par défaut (`js/config.js`) : sur chaque appareil, il suffit de se connecter avec son adresse e-mail (écran Synchronisation).
+
+## 1.3.0 - 2026-11-04
+
+Cahier des charges v0.2. Questionnaire inchangé (version 2.0).
+
+- Historique des debriefs à l'accueil : recherche sans accents ni majuscules (titre, numéro, textes libres, remarques), filtres par état et par année, tri par date d'intervention ou par dernière modification, résumé de chaque fiche (engagement, apport, quasi-incident).
+- Consultation d'une fiche en lecture, sans choisir de rôle : la note affichée en page.
+- Statistiques : indicateurs clés (drone engagé, vols avec apport, quasi-incidents, gain de temps, debriefs terminés), debriefs par mois, répartition des réponses de chaque question fermée par phase (lue dans `questionnaire.json`), filtre par année.
+- Import groupé de notes Obsidian : plusieurs fichiers .md ou un dossier entier, la version la plus récente de chaque fiche est gardée, bilan affiché. Une note de l'appli sans bloc de reprise est reprise depuis son frontmatter (réponses fermées ; textes libres et remarques non récupérés).
+- Synchronisation facultative entre appareils avec Supabase : connexion par code ou lien reçu par e-mail, fiches recopiées dans les deux sens dès que le réseau revient, la plus récente l'emporte, suppressions transmises. Saisie toujours possible hors ligne. Mise en place : `docs/SUPABASE.md` et `supabase/migrations/`.
+- Sans connexion, rien ne change : aucune requête ne sort de l'appli.
+
 ## 1.2.0 - 2026-10-20
 
 - Espèce préremplie avec « Chien » (espèce la plus courante), modifiable.
