@@ -12,7 +12,9 @@ export default defineConfig({
     browserName: 'chromium',
     baseURL: 'http://localhost:' + port,
     locale: 'fr-FR',
-    timezoneId: 'Europe/Paris'
+    timezoneId: 'Europe/Paris',
+    // Navigateur déjà installé ailleurs (environnement sans téléchargement) : PW_CHROMIUM=/chemin/vers/chromium
+    launchOptions: process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {}
   },
   webServer: {
     command: 'node scripts/serve.js',

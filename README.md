@@ -8,7 +8,11 @@ Formulaire pour débriefer et capitaliser sur les vols drone de l'Équipe de Sec
 - Rôle choisi à l'ouverture : le pilote répond, les autres rôles (copilote, auxiliaire) ajoutent des remarques.
 - **Note Markdown pour Obsidian** : frontmatter YAML pour Dataview, corps lisible, section « Données Airdata » réservée, bloc de reprise pour compléter la fiche sur un autre téléphone.
 - Export par copie, fichier .md ou partage natif (vers Obsidian sur Android) ; reprise d'une note par collage ou fichier.
-- Installable sur l'écran d'accueil, fonctionne sans réseau après une première ouverture. Aucune donnée ne quitte le téléphone sans export volontaire.
+- **Historique** : recherche (y compris dans les textes libres), filtres par état et par année, consultation d'une fiche en lecture.
+- **Statistiques** : indicateurs clés, debriefs par mois, répartition des réponses de chaque question.
+- **Import groupé** de notes Obsidian déjà exportées : plusieurs fichiers ou un dossier entier.
+- **Synchronisation facultative entre appareils** avec Supabase (connexion par code reçu par e-mail) : voir [docs/SUPABASE.md](docs/SUPABASE.md).
+- Installable sur l'écran d'accueil, fonctionne sans réseau après une première ouverture. Sans synchronisation activée, aucune donnée ne quitte le téléphone sans export volontaire.
 
 Cahier des charges : [docs/ESAM_CDC_Appli_Debrief_Drone.md](docs/ESAM_CDC_Appli_Debrief_Drone.md).
 
@@ -20,11 +24,19 @@ Site statique sans build, servi tel quel (GitHub Pages), sur le modèle de `julo
 | --- | --- |
 | `questionnaire.json` | Questionnaire (version 2.0) : phases, questions, options, conditions, préremplissages. Seul fichier à modifier pour le faire évoluer |
 | `index.html`, `app.css` | Page et styles (charte ESAM, thème clair et sombre) |
-| `js/app.js` | Écrans, navigation, enregistrement automatique, import |
+| `js/app.js` | Écrans, navigation, enregistrement automatique, import, statistiques, synchronisation |
 | `js/form.js` | Moteur de formulaire : dessine les questions du questionnaire |
 | `js/model.js` | Règles sans DOM : options exclusives, maximum de choix, conditions, F7 depuis C1, grilles, statut |
 | `js/markdown.js` | Note Obsidian : frontmatter YAML, corps, bloc de reprise, nom de fichier |
-| `js/store.js` | Stockage sur l'appareil (IndexedDB, repli localStorage, copie de secours) |
+| `js/store.js` | Stockage sur l'appareil (IndexedDB, repli localStorage, copie de secours, suppressions à transmettre) |
+| `js/history.js` | Historique : recherche, filtres, tri, résumé d'une fiche |
+| `js/stats.js` | Statistiques : indicateurs, debriefs par mois, répartition par question |
+| `js/importer.js` | Import de notes : bloc de reprise, ou reconstruction depuis le frontmatter |
+| `js/view.js` | Consultation : la note affichée en page |
+| `js/sync.js` | Plan de synchronisation (la plus récente l'emporte, suppressions) |
+| `js/cloud.js` | Supabase : connexion par code e-mail, appels REST, synchronisation |
+| `js/config.js` | Adresse et clé publique du projet Supabase |
+| `supabase/migrations/` | Tables, règles d'accès et déclencheur de la base |
 | `js/geo.js` | Position du téléphone pour préremplir le lieu (GPS de l'appareil, sans service tiers) |
 | `js/exporter.js` | Copie, téléchargement, partage natif, avec replis |
 | `sw.js`, `manifest.webmanifest` | Hors ligne et installation |
@@ -48,7 +60,7 @@ Site statique sans build, servi tel quel (GitHub Pages), sur le modèle de `julo
 npm ci
 npm start           # http://localhost:8000
 npm test            # règles, export, cohérence du dépôt
-npm run test:e2e    # Playwright (Chromium)
+npm run test:e2e    # Playwright (Chromium) ; PW_CHROMIUM=/chemin/vers/chromium si le navigateur est installé ailleurs
 npm run lint && npm run format:check
 ```
 

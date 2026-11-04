@@ -1,11 +1,13 @@
-/* Stockage des fiches sur l'appareil : IndexedDB, localStorage à défaut. Rien ne quitte le téléphone.
+/* Stockage des fiches sur l'appareil : IndexedDB, localStorage à défaut. L'appareil reste la référence : la
+ * synchronisation en ligne (cloud.js), quand elle est activée, ne fait que recopier ces fiches.
  * Copie de secours synchrone dans localStorage à chaque modification : une fermeture brutale (onglet tué, batterie)
  * pendant une écriture IndexedDB ne perd pas la dernière saisie. */
 
 var DB = 'esam-debrief',
   STORE = 'fiches',
   LS = 'esam-debrief-fiches',
-  DRAFT = 'esam-debrief-brouillon';
+  DRAFT = 'esam-debrief-brouillon',
+  TOMBES = 'esam-debrief-suppressions';
 var dbp = null;
 
 function openDb() {
@@ -105,7 +107,30 @@ export function get(id) {
     });
 }
 
-export function del(id) {
+/* Suppressions à transmettre à la synchronisation : { debrief_id: date de suppression } */
+export function tombes() {
+  try {
+    return JSON.parse(localStorage.getItem(TOMBES) || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+function saveTombes(t) {
+  try {
+    localStorage.setItem(TOMBES, JSON.stringify(t));
+  } catch (e) {}
+}
+export function oublierTombes(ids) {
+  if (!ids.length) return;
+  var t = tombes();
+  ids.forEach(function (id) {
+    delete t[id];
+  });
+  saveTombes(t);
+}
+
+/** Retire une fiche de l'appareil sans la noter comme supprimée (suppression venue d'un autre appareil). */
+export function remove(id) {
   clearDraft(id);
   return tx('readwrite', function (s) {
     return s.delete(id);
@@ -114,6 +139,14 @@ export function del(id) {
     delete all[id];
     lsSave(all);
   });
+}
+
+/** Suppression par l'utilisateur : transmise aux autres appareils à la prochaine synchronisation. */
+export function del(id) {
+  var t = tombes();
+  t[id] = new Date().toISOString();
+  saveTombes(t);
+  return remove(id);
 }
 
 /** Toutes les fiches, la plus récemment modifiée d'abord. Rattrape une copie de secours plus récente. */
