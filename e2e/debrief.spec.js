@@ -260,7 +260,7 @@ test('9. frontmatter exporté : YAML valide avec les champs prévus', async ({ p
 test("10. hors ligne après une première visite : l'appli s'ouvre, enregistre et exporte", async ({ page, context }) => {
   await page.goto('/');
   await page.evaluate(() => navigator.serviceWorker.ready);
-  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('esam-debrief-v1.3.1');
+  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('esam-debrief-v1.3.2');
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('#net')).toBeVisible();

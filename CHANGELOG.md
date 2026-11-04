@@ -2,6 +2,10 @@
 
 Versions de l'appli (semver). La version du questionnaire est suivie à part (`questionnaire.json`, champ `version`) ; les deux figurent dans chaque note exportée.
 
+## 1.3.2 - 2026-11-04
+
+- Connexion : le lien de l'e-mail devient la voie principale (Supabase n'ajoute le code à l'e-mail qu'avec un serveur d'envoi personnel). Le champ du code reste disponible pour un e-mail qui en contient un.
+
 ## 1.3.1 - 2026-11-04
 
 - Projet Supabase de l'ESAM branché par défaut (`js/config.js`) : sur chaque appareil, il suffit de se connecter avec son adresse e-mail (écran Synchronisation).

@@ -2,6 +2,10 @@
 
 Formulaire pour débriefer et capitaliser sur les vols drone de l'Équipe de Secours Animalier en Montagne (ESAM), DJI M30T.
 
+## 👉 [Ouvrir l'appli : julok35.github.io/esam-flights-debrief](https://julok35.github.io/esam-flights-debrief/)
+
+Sur le téléphone, ouvrir ce lien puis « Ajouter à l'écran d'accueil » pour l'installer : elle fonctionne ensuite sans réseau.
+
 - **À chaud**, sur place, en moins de 2 minutes : 5 questions sur un écran, réponses à toucher.
 - **À froid**, au calme : six phases (préparation, mise en place, vol, retour, dérushage, analyse), avancement par phase.
 - Parcours court quand le drone n'a pas été engagé.
@@ -68,4 +72,4 @@ Le service worker sert l'appli depuis son cache : après une modification, chang
 
 ## Publication
 
-GitHub Pages, depuis la branche principale, dossier racine (`.nojekyll` présent) : https://julok35.github.io/esam-flights-debrief/ une fois Pages activé dans les réglages du dépôt.
+GitHub Pages, depuis la branche principale, dossier racine (`.nojekyll` présent) : https://julok35.github.io/esam-flights-debrief/
