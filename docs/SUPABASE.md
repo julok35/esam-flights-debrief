@@ -70,7 +70,7 @@ l'appli installée sur l'écran d'accueil (surtout sur iPhone, où le lien s'ouv
 Deux possibilités :
 
 - **Pour tous les appareils d'un coup** (recommandé) : les écrire dans [`js/config.js`](../js/config.js), changer la
-  version de l'appli (voir `CLAUDE.md`) et publier.
+  version de l'appli (voir `CLAUDE.md`) et publier. Fait pour le projet de l'ESAM (`rcwbwokguvnluwuilxoo`, depuis la v1.3.1).
 - **Appareil par appareil** : écran **Synchronisation** de l'appli, bloc **Projet Supabase**.
 
 ### 6. Se connecter

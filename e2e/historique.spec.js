@@ -201,6 +201,8 @@ async function connect(page) {
   await page.goto('/');
   await expect(page.locator('#syncState')).toContainText('non activée');
   await page.click('#accountBtn');
+  // Projet par défaut (js/config.js) remplacé par le Supabase simulé
+  if (!(await page.locator('#cloudUrl').isVisible())) await page.click('#cloudConfig summary');
   await page.fill('#cloudUrl', 'https://pas-supabase.example.com');
   await page.fill('#cloudKey', 'cle-publique');
   await page.click('#cloudSave');

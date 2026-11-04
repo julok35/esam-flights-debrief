@@ -2,6 +2,10 @@
 
 Versions de l'appli (semver). La version du questionnaire est suivie à part (`questionnaire.json`, champ `version`) ; les deux figurent dans chaque note exportée.
 
+## 1.3.1 - 2026-11-04
+
+- Projet Supabase de l'ESAM branché par défaut (`js/config.js`) : sur chaque appareil, il suffit de se connecter avec son adresse e-mail (écran Synchronisation).
+
 ## 1.3.0 - 2026-11-04
 
 Cahier des charges v0.2. Questionnaire inchangé (version 2.0).
