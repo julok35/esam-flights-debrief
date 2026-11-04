@@ -52,15 +52,18 @@ Retirer quelqu'un : `delete from public.membres where email = 'prenom.nom@exempl
 - Site URL : `https://julok35.github.io/esam-flights-debrief/`
 - Redirect URLs : la même adresse, plus `http://localhost:8000/` pour le développement.
 
-**Authentication**, **Emails**, **Templates** : dans les modèles **Magic Link** et **Confirm signup**, ajouter le
-code sous le lien, par exemple :
+Facultatif, **Authentication**, **Emails**, **Templates** : dans les modèles **Magic Link** et **Confirm signup**,
+ajouter le code sous le lien. Supabase ne permet de modifier les modèles qu'avec un serveur d'envoi personnel
+(**SMTP Settings**, par exemple un compte Gmail avec mot de passe d'application, ou Brevo, Resend). Sans cela,
+l'e-mail ne contient que le lien, ce qui suffit. Exemple de ligne :
 
 ```html
 <p>Ton code de connexion : <strong>{{ .Token }}</strong></p>
 ```
 
-Sans cette ligne, l'e-mail ne contient que le lien. Le lien suffit dans le navigateur ; le code est plus sûr avec
-l'appli installée sur l'écran d'accueil (surtout sur iPhone, où le lien s'ouvre dans Safari et non dans l'appli).
+Le lien doit être ouvert sur l'appareil à connecter, dans le navigateur où l'appli est utilisée (sur Android,
+l'appli installée partage les données de Chrome). Sur iPhone, l'appli installée sur l'écran d'accueil ne partage pas
+les données de Safari : le code est alors nécessaire, donc le serveur d'envoi personnel.
 
 ### 5. Brancher l'appli
 
@@ -75,7 +78,7 @@ Deux possibilités :
 
 ### 6. Se connecter
 
-Écran **Synchronisation** : adresse e-mail, **Recevoir un code**, saisir le code, **Se connecter**. Les fiches déjà
+Écran **Synchronisation** : adresse e-mail, **Recevoir un e-mail de connexion**, puis ouvrir le lien de l'e-mail sur le même appareil (ou saisir le code, s'il y en a un). Les fiches déjà
 présentes sur le téléphone partent aussitôt ; celles des autres appareils arrivent.
 
 ## Reprendre les anciens debriefs

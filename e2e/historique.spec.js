@@ -211,7 +211,7 @@ async function connect(page) {
   await page.click('#cloudSave');
   await page.fill('#cloudEmail', 'Pilote@ESAM.test');
   await page.click('#sendCode');
-  await expect(page.locator('#cloudMsg')).toContainText('Code envoyé à pilote@esam.test');
+  await expect(page.locator('#cloudMsg')).toContainText('E-mail envoyé à pilote@esam.test');
   await page.fill('#cloudCode', '000000');
   await page.click('#verifyCode');
   await expect(page.locator('#cloudMsg')).toContainText('Code incorrect ou expiré');

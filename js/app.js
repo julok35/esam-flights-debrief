@@ -1345,7 +1345,7 @@ function accountScreen() {
     var step2 = h(
       'div',
       { class: 'f', id: 'codeStep', hidden: true },
-      h('label', { class: 'f-l', for: 'cloudCode' }, 'Code reçu par e-mail'),
+      h('label', { class: 'f-l', for: 'cloudCode' }, "Code reçu par e-mail, s'il y en a un"),
       code,
       h(
         'button',
@@ -1380,7 +1380,7 @@ function accountScreen() {
         h(
           'p',
           { class: 'hint' },
-          'Sans mot de passe : un code à usage unique est envoyé à ton adresse. Le lien du même e-mail fonctionne aussi.'
+          "Sans mot de passe : un e-mail de connexion est envoyé à ton adresse. Ouvre son lien sur cet appareil, dans le navigateur où tu utilises l'appli (Chrome pour l'appli installée sur Android). Un lien ne sert qu'une fois."
         ),
         h('label', { class: 'f-l', for: 'cloudEmail' }, 'Adresse e-mail'),
         email,
@@ -1399,9 +1399,11 @@ function accountScreen() {
               say('Envoi du code...');
               cloud.sendCode(e).then(
                 function () {
-                  say('Code envoyé à ' + e + ' : regarde ta messagerie (et les indésirables).', 'ok');
+                  say(
+                    'E-mail envoyé à ' + e + ' : ouvre son lien sur cet appareil (regarde aussi les indésirables).',
+                    'ok'
+                  );
                   step2.hidden = false;
-                  code.focus();
                 },
                 function (x) {
                   say(x.message, 'err');
@@ -1409,7 +1411,7 @@ function accountScreen() {
               );
             }
           },
-          'Recevoir un code'
+          'Recevoir un e-mail de connexion'
         ),
         step2
       )
