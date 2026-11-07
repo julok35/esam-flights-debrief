@@ -1,10 +1,10 @@
 ---
 titre: Cahier des charges - Appli de debrief des vols drone ESAM
-version: 0.2
-date_maj: 2026-11-04
+version: 0.3
+date_maj: 2026-11-07
 statut: Brouillon
 responsable: Julien de Feydeau
-questionnaire_version: 2.0
+questionnaire_version: 2.1
 destinataire: Claude Code (développement)
 ---
 
@@ -54,11 +54,15 @@ Les réponses servent quatre usages, par ordre de priorité :
   - statistiques sur les debriefs (indicateurs clés, debriefs par mois, répartition des réponses de chaque question fermée) ;
   - import groupé de notes Obsidian déjà exportées (plusieurs fichiers ou un dossier) ;
   - synchronisation facultative entre appareils, par une base Supabase (section 4).
+- *Ajouts v0.3 (décision du responsable du 2026-11-07, questionnaire 2.1)* :
+  - contrôles de cohérence C1 / F7 et C2 / F9, et bloc « Fiches à vérifier » dans les statistiques (section 6.10) ;
+  - obstacles repérés à l'installation (F6) ;
+  - F12 : durée de vol approximative à la place du volume en Go (section 6.8).
 
 **Hors périmètre (v1)**
 
 - ~~Pas de serveur, pas de compte, pas de synchronisation en ligne entre appareils.~~ Levé en v0.2 : synchronisation facultative par Supabase, l'appli restant entièrement utilisable sans compte.
-- Pas de ressaisie des données Pat'rouille (requérant, animal, chronologie, issue) ni Airdata (vols, durées, trajectoires, batteries par vol, alertes).
+- Pas de ressaisie des données Pat'rouille (requérant, animal, chronologie, issue) ni Airdata (vols, durées, trajectoires, batteries par vol, alertes). Seule exception : la durée totale de vol de F12, estimée de mémoire par le pilote, qui sert uniquement à dimensionner les cartes SD et le boîtier de sauvegarde ; les durées exactes restent celles d'Airdata (section 9).
 - Pas de calcul dans l'appli à partir des logs Airdata : ce post-traitement est fait par Claude, hors appli (section 9).
 - Pas de nom de personne : uniquement des rôles.
 
@@ -117,7 +121,9 @@ Si « non engagé » est coché en C2 :
 - C3, C4 et C5 sont masquées ;
 - à froid, seules la question NE1 (section 6.3) et la question F14 sont proposées.
 
-## 6. Questionnaire (version 2.0)
+## 6. Questionnaire (version 2.1)
+
+Version 2.1 (2026-11-07) : confirmation C1 / F7, aide sous « Sans apport » en C2, obstacles repérés en F6, bandeau C2 / F9, durée de vol en F12. Les fiches saisies en 2.0 restent lisibles, modifiables, exportables et comptées dans les statistiques : aucune clé ni valeur existante n'est renommée ou supprimée, les nouvelles clés sont facultatives, et une fiche garde sa `questionnaire_version` d'origine tant qu'elle n'est pas modifiée.
 
 ### 6.1 Conventions
 
@@ -134,7 +140,7 @@ Si « non engagé » est coché en C2 :
 | Date de l'intervention | Date | Aujourd'hui par défaut |
 | Numéro Pat'rouille | Texte | Facultatif à chaud |
 | Rôle de la personne qui saisit | Choix unique : pilote, copilote, auxiliaire, autre | Pilote par défaut |
-| Version du questionnaire | Automatique | 2.0 |
+| Version du questionnaire | Automatique | 2.1 (version d'origine gardée tant que la fiche n'est pas modifiée) |
 | Identifiant de fiche | Automatique | Unique, stable, sert à la reprise |
 
 ### 6.3 À chaud
@@ -144,11 +150,13 @@ Si « non engagé » est coché en C2 :
 - Réponse : choix unique oui ou non.
 - Si oui, choix multiple : obstacle, perte de liaison, relief, météo, tiers, énergie, humain, autre.
 - Effet : une fiche F7 est ouverte à froid pour chaque catégorie cochée.
+- Cohérence (2.1) : si C1 passe à « Non » alors que F7 contient des quasi-incidents décrits, une confirmation intégrée à la page propose « Supprimer les N quasi-incidents décrits » ou « Garder et repasser C1 à Oui ». Rien n'est supprimé sans ce choix.
 
 **C2. « Qu'est-ce que le drone a apporté ? »**
 - Usage : efficacité de la recherche, financements, prospective.
 - Choix multiple : localisation de l'animal, levée de doute, reconnaissance du terrain, voie d'accès, guidage de l'équipe, surveillance de l'animal, autre.
 - Options exclusives : sans apport, non engagé.
+- Aide sous « sans apport » (2.1) : « Le drone n'a rien changé, même pas une zone écartée ou une décision. Une recherche négative qui écarte une zone est une levée de doute. »
 - Effet : « non engagé » déclenche le parcours court (5.4).
 
 **C3. Dernier indice reçu avant la localisation**
@@ -214,6 +222,7 @@ Si « non engagé » est coché en C2 :
 **F6. Grille des conditions du poste de pilotage**
 - Valeurs : bien, neutre, pas bien. Valeur par défaut : neutre.
 - Lignes : accès et portage ; surface de décollage (neige, boue, herbe haute, mouillée) ; pente ou irrégularités ; obstacles (arbres, câbles, rochers autour du point) ; abri (pluie, vent) ; température (pilote et matériel) ; lisibilité de l'écran (soleil, reflets) ; éclairage (nuit, pénombre) ; réseau (RTK, FlightHub) ; tiers.
+- *Obstacles repérés à l'installation* (2.1, facultatif) : choix multiple : ligne électrique, câble (téléphérique, remontée, forestier), arbre ou végétation haute, paroi, autre. Pour chaque obstacle coché, choix unique : sur la trajectoire, hors trajectoire. Un obstacle présent dans le secteur mais hors trajectoire n'est pas un quasi-incident (F7). Clés exportées : `f6_obstacles_reperes`, `f6_obstacles_trajectoire` (la ligne « obstacles » de la grille reste `f6_obstacles`).
 - Commentaire libre.
 
 ### 6.6 À froid, phase 3 : Vol
@@ -246,6 +255,7 @@ Si « non engagé » est coché en C2 :
 - Effets, choix multiple : temps gagné, risque évité pour l'équipe ou les cordistes, zone écartée sans y envoyer personne, itinéraire plus sûr ou plus court, stress de l'animal limité, décision prise plus vite (engager, arrêter, changer de zone), autre.
 - Gain de temps total, choix unique : aucun, moins de 30 min, 30 min à 1 h, plus de 1 h, impossible à dire.
 - Commentaire libre.
+- Cohérence (2.1) : si C2 vaut « sans apport » et que des effets sont cochés, un bandeau propose de revoir C2 (lien vers la phase À chaud). Rien n'est modifié automatiquement.
 
 **F10. « Le pilote était-il secondé ? »**
 - Choix unique : oui ; non, mais ça aurait été préférable ; non, et ce n'était pas indispensable.
@@ -263,8 +273,11 @@ Si « non engagé » est coché en C2 :
 ### 6.8 À froid, phase 5 : Dérushage
 
 **F12. Volume enregistré par le drone**
-- Usage : dimensionner les cartes SD et le futur boîtier de sauvegarde terrain.
-- Jauge de 0 à 512 Go, par pas de 8 Go, avec la valeur affichée. Drone uniquement, pas les smartphones.
+- Usage (inchangé) : dimensionner les cartes SD et le futur boîtier de sauvegarde terrain.
+- Saisie (2.1) : « Durée totale de vol, approximative », compteur en minutes par pas de 5 (`f12_duree_min`). Drone uniquement, pas les smartphones. Le pilote ne connaît pas le volume en Go, mais a une idée de la durée de vol.
+- La durée saisie est une estimation du pilote, qui sert seulement à dimensionner les cartes SD et le boîtier de sauvegarde. Les durées exactes restent celles d'Airdata (section 9).
+- Affiché sous le compteur : le volume estimé, durée (min) x débit (Go/min). Tous les vols sont enregistrés en 4 flux (Screen, Wide, Thermal, Zoom) : le débit des 4 flux est une constante de l'appli (`DEBIT_GO_PAR_MIN`, `js/config.js`), à calibrer selon `docs/CALIBRAGE_DEBIT.md`. Exporté avec la durée : `f12_volume_estime` et `f12_debit_go_min`.
+- Compatibilité 2.0 : une fiche qui a `f12_volume` (jauge de 0 à 512 Go de la version 2.0) et pas `f12_duree_min` affiche « Volume saisi : X Go (ancienne version) » en lecture seule, sans rien demander. Les statistiques de volume prennent `f12_volume` s'il existe, sinon l'estimation.
 - Plus le champ « remarques » de la phase.
 
 ### 6.9 À froid, phase 6 : Analyse
@@ -280,6 +293,12 @@ Si « non engagé » est coché en C2 :
 - Option exclusive : aucune.
 - Pour chaque capacité cochée : « aurait-elle changé l'issue ? », choix unique oui, peut-être, non.
 - Test ou nouvel usage à essayer : texte libre.
+
+### 6.10 Statistiques : fiches à vérifier (2.1)
+
+- Indicateur « Avec quasi-incident » : une fiche compte si C1 est à « oui » ou si F7 contient au moins un quasi-incident décrit, y compris pour les fiches déjà saisies, sans les modifier.
+- Bloc « Fiches à vérifier », avec un lien vers chaque fiche : incohérences C1 / F7 (C1 à « non » et quasi-incidents décrits en F7) et C2 / F9 (« sans apport » et effets cochés en F9) ; debriefs non terminés (statut autre que terminé).
+- Rien n'est corrigé automatiquement.
 
 ## 7. Données et export
 
@@ -322,7 +341,7 @@ Ces traitements sont faits par Claude à partir des notes exportées. L'appli do
 
 1. **Écarts C3** : calcul de l'écart horizontal et vertical entre les coordonnées de l'indice et celles de l'animal, quand elles sont disponibles. Sources possibles : coordonnées reçues par la régulation ou lues avec esam-gps, photo PinPoint, photo géolocalisée prise sur place. Écriture dans la note avec `ecart_source: calcule`. Sinon, l'estimation saisie est conservée avec `ecart_source: estime`.
 2. **Section Données Airdata** : vols, durées, distance maximale, hauteur maximale, batteries utilisées, alertes.
-3. **Agrégation** : tableaux de bord Dataview sur l'ensemble des fiches (fréquence des quasi-incidents par catégorie, points de décollage subis contre choisis, manques récurrents, capacités demandées, volumes enregistrés).
+3. **Agrégation** : tableaux de bord Dataview sur l'ensemble des fiches (fréquence des quasi-incidents par catégorie, obstacles repérés par type, points de décollage subis contre choisis, manques récurrents, capacités demandées, volumes enregistrés : `f12_volume` pour les fiches 2.0, sinon `f12_volume_estime`, recalculable avec `f12_duree_min` une fois le débit calibré).
 4. **Revue du questionnaire** après 5 debriefs : identifier les questions qui reçoivent toujours la même réponse et celles qui ont fait émerger une action.
 
 ## 10. Exigences non fonctionnelles
@@ -373,3 +392,4 @@ Tests automatisés (Playwright, navigateur Chromium) au minimum :
 |---|---|---|
 | 0.1 | 2026-10-19 | Création à partir du questionnaire v2.0 validé question par question. |
 | 0.2 | 2026-11-04 | Historique, statistiques, import groupé de notes Obsidian, synchronisation facultative entre appareils (Supabase). Questionnaire inchangé. |
+| 0.3 | 2026-11-07 | Questionnaire 2.1 : confirmation C1 / F7, aide « sans apport » en C2, obstacles repérés en F6, bandeau C2 / F9, F12 en durée de vol avec volume estimé, fiches à vérifier dans les statistiques. Compatibilité des fiches 2.0. |

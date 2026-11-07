@@ -5,6 +5,7 @@ import { parse } from 'yaml';
 import * as M from '../js/model.js';
 import { toMarkdown, extractState, fileName, frontmatter } from '../js/markdown.js';
 import { APP_VERSION } from '../js/version.js';
+import { DEBIT_GO_PAR_MIN } from '../js/config.js';
 import { loadQ, sampleFiche } from './helpers.js';
 
 var q = loadQ();
@@ -26,6 +27,7 @@ function expectedKeys() {
       if (f.type === 'grid') f.rows.forEach((r) => keys.push(f.key + '_' + r.v.replace(/-/g, '_')));
       else if (f.type === 'repeat') keys.push(f.key + '_nb', f.key + '_categories', f.key + '_incidents');
       else keys.push(f.key);
+      if (f.estimation) keys.push(f.estimation.key, f.estimation.debitKey);
     });
     (qu.derived || []).forEach((d) => keys.push(d.key));
   });
@@ -36,9 +38,10 @@ test('frontmatter : YAML valide avec tous les champs prévus (fiche vide et fich
   for (var f of [M.newFiche(q), sampleFiche(q)]) {
     var fm = fmOf(toMarkdown(q, f));
     assert.deepEqual(Object.keys(fm), expectedKeys());
+    assert.equal(new Set(expectedKeys()).size, expectedKeys().length, 'aucune clé du frontmatter en double');
     assert.equal(fm.type, 'debrief-vol-drone');
     assert.equal(fm.debrief_id, f.debrief_id);
-    assert.equal(fm.questionnaire_version, '2.0');
+    assert.equal(fm.questionnaire_version, q.version);
     assert.equal(fm.app_version, APP_VERSION);
     assert.deepEqual(fm.tags, ['esam/debrief-drone']);
   }
@@ -66,7 +69,10 @@ test('frontmatter : valeurs normalisées, listes, grilles, F7, F14', () => {
     { categorie: 'perte-liaison', moment: 'recherche', evite: ['rth'], gravite: null }
   ]);
   assert.deepEqual(fm.f14_issue, { 'relais-garmin': 'peut-etre' });
-  assert.equal(fm.f12_volume, 64);
+  assert.equal(fm.f12_duree_min, 45);
+  assert.equal(fm.f12_volume, null, 'ancien champ vide pour une fiche 2.1');
+  assert.equal(fm.f12_volume_estime, 45 * DEBIT_GO_PAR_MIN);
+  assert.equal(fm.f12_debit_go_min, DEBIT_GO_PAR_MIN);
   assert.equal(fm.ne1.length, 0);
   assert.equal(fm.statut, 'froid-en-cours');
 });

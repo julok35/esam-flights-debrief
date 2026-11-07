@@ -1,6 +1,10 @@
 // Critères d'acceptation du cahier des charges (section 11), dans Chromium au format smartphone.
 import { test, expect } from '@playwright/test';
 import { parse } from 'yaml';
+import { readFileSync } from 'node:fs';
+import { APP_VERSION } from '../js/version.js';
+
+var QV = JSON.parse(readFileSync(new URL('../questionnaire.json', import.meta.url), 'utf8')).version;
 
 var chip = (page, q, v) => page.locator('#q-' + q + ' [data-v="' + v + '"]');
 
@@ -248,7 +252,7 @@ test('9. frontmatter exporté : YAML valide avec les champs prévus', async ({ p
   var md = await exportText(page);
   var fm = frontmatter(md);
   expect(fm.type).toBe('debrief-vol-drone');
-  expect(fm.questionnaire_version).toBe('2.0');
+  expect(fm.questionnaire_version).toBe(QV);
   expect(fm.tags).toEqual(['esam/debrief-drone']);
   for (var k of ['debrief_id', 'statut', 'date_maj', 'app_version', 'c1', 'c2', 'f6_abri', 'f8_autonomie', 'f14_issue'])
     expect(fm).toHaveProperty(k);
@@ -260,7 +264,7 @@ test('9. frontmatter exporté : YAML valide avec les champs prévus', async ({ p
 test("10. hors ligne après une première visite : l'appli s'ouvre, enregistre et exporte", async ({ page, context }) => {
   await page.goto('/');
   await page.evaluate(() => navigator.serviceWorker.ready);
-  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('esam-debrief-v1.3.2');
+  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('esam-debrief-v' + APP_VERSION);
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('#net')).toBeVisible();

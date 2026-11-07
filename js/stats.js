@@ -11,9 +11,11 @@ import {
   gridFilled,
   perOptionRows,
   isEmpty,
-  indexFields
+  indexFields,
+  valeurRetenue
 } from './model.js';
 import { ficheDate } from './history.js';
+import { avecQuasiIncident, quasiIncidentRenseigne } from './coherence.js';
 
 export function pct(n, d) {
   return d ? Math.round((n * 100) / d) : 0;
@@ -80,6 +82,13 @@ function fieldStats(q, field, fiches) {
   if (field.type === 'single' || field.type === 'multi' || field.type === 'flag')
     return distOf(field, optionsOf(q, field), vals);
   if (field.type === 'slider' || field.type === 'counter') return numOf(field, vals);
+  if (field.type === 'estimation')
+    return numOf(
+      field,
+      fiches.map(function (f) {
+        return valeurRetenue(q, field.source, f);
+      })
+    );
   if (field.type === 'grid') {
     var filled = vis.filter(function (f) {
       return gridFilled(q, field, f);
@@ -188,11 +197,12 @@ export function kpis(q, fiches) {
     });
   }
   if (idx.c1) {
+    // C1 à « Oui » ou quasi-incident décrit en F7 (une fiche à « Non » avec un incident décrit compte aussi)
     var withC1 = fiches.filter(function (f) {
-      return !isEmpty(effective(q, 'c1', f));
+      return quasiIncidentRenseigne(q, f);
     });
     var qi = countIf(withC1, function (f) {
-      return effective(q, 'c1', f) === 'oui';
+      return avecQuasiIncident(q, f);
     });
     out.push({
       id: 'quasi',
@@ -262,6 +272,27 @@ export function parMois(fiches) {
   return out;
 }
 
+/**
+ * Champs à compter pour une question : champs fermés, sauf ceux d'une ancienne version (repris dans l'estimation) ;
+ * un champ à estimation (F12) ajoute un bloc « valeur retenue » : la valeur saisie autrefois, sinon l'estimation.
+ */
+function statFields(qu) {
+  var out = [];
+  qu.fields.forEach(function (f) {
+    if (f.type === 'text' || f.ancien) return;
+    out.push(f);
+    if (f.estimation)
+      out.push({
+        key: f.key,
+        type: 'estimation',
+        source: f,
+        l: f.estimation.stat || f.estimation.l,
+        unit: f.estimation.unit
+      });
+  });
+  return out;
+}
+
 /** Tout le tableau : indicateurs, mois, et détail par phase et par question. */
 export function computeStats(q, fiches) {
   return {
@@ -275,10 +306,7 @@ export function computeStats(q, fiches) {
             return qu.phase === p.id;
           })
           .map(function (qu) {
-            var blocs = qu.fields
-              .filter(function (f) {
-                return f.type !== 'text';
-              })
+            var blocs = statFields(qu)
               .map(function (f) {
                 var s = fieldStats(q, f, fiches);
                 if (s) s.l = strip(f.l);

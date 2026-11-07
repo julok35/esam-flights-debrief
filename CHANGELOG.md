@@ -2,6 +2,17 @@
 
 Versions de l'appli (semver). La version du questionnaire est suivie à part (`questionnaire.json`, champ `version`) ; les deux figurent dans chaque note exportée.
 
+## 1.4.0 - 2026-11-07
+
+Questionnaire 2.1, cahier des charges v0.3. Les fiches saisies en 2.0 restent lisibles, modifiables, exportables et comptées dans les statistiques : aucune clé ni valeur existante n'est renommée ou supprimée, et une fiche garde sa version de questionnaire tant qu'elle n'est pas modifiée.
+
+- C1 / F7 : passer C1 à « Non » alors que F7 décrit des quasi-incidents affiche une confirmation dans la page (supprimer les quasi-incidents décrits, ou garder et repasser C1 à « Oui »). L'indicateur « Avec quasi-incident » compte une fiche si C1 est à « Oui » ou si F7 décrit un quasi-incident, anciennes fiches comprises.
+- Mise en place (F6) : nouveau champ facultatif « Obstacles repérés à l'installation » (ligne électrique, câble, arbre ou végétation haute, paroi, autre), avec pour chacun « Sur la trajectoire » ou « Hors trajectoire ». Repris dans la note (`f6_obstacles_reperes`, `f6_obstacles_trajectoire`) et dans les statistiques.
+- C2 : aide sous « Sans apport ». F9 : si C2 vaut « Sans apport » et que des effets sont cochés, bandeau qui propose de revoir C2 (lien vers la phase À chaud).
+- Statistiques : bloc « Fiches à vérifier » (incohérences C1 / F7 et C2 / F9, debriefs non terminés), avec un lien vers chaque fiche. Rien n'est corrigé automatiquement.
+- F12 : la saisie du volume en Go est remplacée par la durée totale de vol, approximative (`f12_duree_min`, compteur par pas de 5 min), avec le volume estimé affiché dessous (durée x débit des 4 flux, `DEBIT_GO_PAR_MIN` dans `js/config.js`, valeur provisoire à calibrer : `docs/CALIBRAGE_DEBIT.md`). Une fiche 2.0 affiche « Volume saisi : X Go (ancienne version) » en lecture seule ; les statistiques de volume prennent ce volume s'il existe, sinon l'estimation.
+- Note exportée : `f12_duree_min`, `f12_volume_estime` et `f12_debit_go_min` ajoutés au frontmatter, `f12_volume` gardé.
+
 ## 1.3.2 - 2026-11-04
 
 - Connexion : le lien de l'e-mail devient la voie principale (Supabase n'ajoute le code à l'e-mail qu'avec un serveur d'envoi personnel). Le champ du code reste disponible pour un e-mail qui en contient un.

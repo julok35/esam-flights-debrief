@@ -1,6 +1,7 @@
 /* Règles du questionnaire, sans DOM (testées sous Node) : valeurs, conditions d'affichage, options exclusives,
  * préremplissages, fiches F7 ouvertes depuis C1, avancement par phase, statut de la fiche. */
 import { APP_VERSION } from './version.js';
+import { DEBIT_GO_PAR_MIN } from './config.js';
 
 /**
  * Fiche : tout ce qui est enregistré sur l'appareil et dans le bloc de reprise de la note.
@@ -124,7 +125,12 @@ export function fieldVisible(q, key, fiche) {
   var e = indexFields(q)[key];
   if (!e) return false;
   if (e.question && !questionVisible(q, e.question, fiche)) return false;
-  var c = e.field.showIf;
+  var f = e.field;
+  // Champ d'une ancienne version du questionnaire : affiché (en lecture seule) seulement s'il a une valeur
+  if (f.ancien) return !isEmpty(fiche.answers[key]);
+  // Saisie remplacée par l'ancien champ quand la fiche en a un (F12 : volume saisi en version 2.0)
+  if (f.estimation && f.estimation.ancien && !isEmpty(fiche.answers[f.estimation.ancien])) return false;
+  var c = f.showIf;
   if (!c) return true;
   return fieldVisible(q, c.key, fiche) && testCond(c, fiche.answers[c.key]);
 }
@@ -196,9 +202,13 @@ function isColdPhase(q, phaseId) {
   return !!p && p.temps === 'froid';
 }
 
-/** Après une modification : date de mise à jour, statut, fiches F7. */
+/**
+ * Après une modification : date de mise à jour, version du questionnaire, statut, fiches F7. Une fiche saisie avec
+ * une version antérieure garde sa version tant qu'elle n'est pas modifiée.
+ */
 export function touch(q, fiche, phaseId) {
   fiche.maj = new Date().toISOString();
+  fiche.questionnaire_version = q.version;
   if (isColdPhase(q, phaseId) && (fiche.statut === 'chaud-en-cours' || fiche.statut === 'chaud-fait'))
     fiche.statut = 'froid-en-cours';
   syncRepeats(q, fiche);
@@ -330,6 +340,24 @@ export function addItem(q, fiche, key) {
   fiche.answers[key] = items;
   touch(q, fiche, phaseOfKey(q, key));
   return it;
+}
+
+/** Supprime toutes les fiches d'un bloc répété (F7), y compris celles ouvertes depuis C1. */
+export function clearItems(q, fiche, key) {
+  delete fiche.answers[key];
+  delete fiche.answers[key + '_ignores'];
+  touch(q, fiche, phaseOfKey(q, key));
+}
+
+/** Fiches d'un bloc répété qui contiennent une saisie (la catégorie reprise de C1 ne compte pas). */
+export function itemsDecrits(q, key, fiche) {
+  var field = indexFields(q)[key].field;
+  return (fiche.answers[key] || []).filter(function (it) {
+    return field.fields.some(function (f) {
+      if (it.seed && f.key === field.seedKey) return false;
+      return !isEmpty(it[f.key]);
+    });
+  });
 }
 
 export function removeItem(q, fiche, key, id) {
@@ -482,8 +510,37 @@ export function statutLabel(q, v) {
 export function finishHot(q, fiche) {
   if (fiche.statut === 'chaud-en-cours') fiche.statut = 'chaud-fait';
   fiche.maj = new Date().toISOString();
+  fiche.questionnaire_version = q.version;
 }
 export function finishAll(q, fiche) {
   fiche.statut = 'termine';
   fiche.maj = new Date().toISOString();
+  fiche.questionnaire_version = q.version;
+}
+
+/* ---------- Estimation (F12 : volume des rushs déduit de la durée de vol) ---------- */
+
+/** Arrondi pour l'affichage et l'export : au dixième. */
+function arrondi(x) {
+  return Math.round(x * 10) / 10;
+}
+
+/** Valeur estimée d'un champ à estimation (durée x débit), ou null si la durée n'est pas saisie ou masquée. */
+export function estimation(q, field, fiche) {
+  var v = effective(q, field.key, fiche);
+  if (typeof v !== 'number' || isNaN(v)) return null;
+  return arrondi(v * DEBIT_GO_PAR_MIN);
+}
+
+/**
+ * Valeur retenue pour les statistiques : la valeur saisie dans l'ancien champ (F12 en version 2.0) si elle existe,
+ * sinon l'estimation. null si aucune des deux.
+ */
+export function valeurRetenue(q, field, fiche) {
+  var anc = field.estimation && field.estimation.ancien;
+  if (anc && fieldVisible(q, anc, fiche)) {
+    var v = fiche.answers[anc];
+    if (typeof v === 'number' && !isNaN(v)) return v;
+  }
+  return estimation(q, field, fiche);
 }
