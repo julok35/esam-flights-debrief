@@ -222,3 +222,17 @@ input:disabled, textarea:disabled { opacity: .7; }
 .st-l small { font-weight: 500; color: var(--muted); font-size: 1rem; }
 .st-num { margin: 0; }
 .st-grid { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+
+/* Questionnaire 2.1 : compteur avec unité, estimation, ancienne valeur, aides d'option, bandeaux de cohérence */
+.counter.unit { grid-template-columns: 56px minmax(104px, auto) 56px; }
+.f-est { margin: 8px 0 0; font-weight: 600; }
+.ancien-val { margin: 0; padding: 10px 12px; border-radius: 10px; border: 2px dashed var(--muted); font-weight: 600; }
+.opt-aide { margin-top: 8px; }
+.alerte { margin-top: 12px; padding: 12px; border-radius: 10px; border: 2px solid var(--noir); border-left: 8px solid var(--rouge); background: var(--jaune); color: var(--noir); }
+.alerte p { margin: 0 0 10px; font-weight: 600; }
+.alerte-a { display: flex; flex-wrap: wrap; gap: 8px; }
+.verif ul { list-style: none; margin: 0; padding: 0; }
+.verif li { padding: 8px 0; border-top: 1px solid var(--line); }
+.verif li:first-child { border-top: 0; }
+.verif a { color: var(--fg); font-weight: 700; display: inline-block; min-height: 48px; line-height: 48px; }
+.verif .raison { display: block; color: var(--muted); }

@@ -27,11 +27,17 @@ export function sampleFiche(q) {
   M.setItemValue(q, f, 'f7', it.id, 'faits', 'Perte vidéo 20 s\nRTH déclenché');
   M.tapItem(q, f, 'f7', it.id, 'moment', 'recherche');
   M.tapItem(q, f, 'f7', it.id, 'evite', 'rth');
-  M.setValue(q, f, 'f12_volume', 64);
+  M.setValue(q, f, 'f12_duree_min', 45);
   M.tap(q, f, 'f14', 'relais-garmin');
   M.tapPerOption(q, f, 'f14_issue', 'relais-garmin', 'peut-etre');
   M.setValue(q, f, 'f14_test', 'Essai relais -- 100 %% sûr \u2014 vraiment');
   var r = M.addRemark(q, f, 'vol', 'copilote');
   M.setRemark(q, f, 'vol', r.id, { texte: 'Vue directe perdue' });
   return f;
+}
+
+/** Fiche de référence saisie en questionnaire 2.0 (f12_volume, C1 à « Non » avec un quasi-incident décrit en F7,
+ * C2 « Sans apport » avec une zone écartée en F9). Copie neuve à chaque appel. */
+export function fiche20() {
+  return JSON.parse(readFileSync(new URL('./fixtures/fiche-2.0.json', import.meta.url), 'utf8'));
 }

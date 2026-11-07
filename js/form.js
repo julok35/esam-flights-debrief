@@ -4,6 +4,8 @@
 import * as M from './model.js';
 import { h, toast } from './util.js';
 import { currentPosition } from './geo.js';
+import { estimationTexte } from './markdown.js';
+import { incoherenceC1F7, incoherenceC2F9, pluriel } from './coherence.js';
 
 var seq = 0;
 function nid(p) {
@@ -132,14 +134,16 @@ function slider(ctx, field, b, labelId, reg) {
   return wrap;
 }
 
+/** Compteur avec + et -, par pas de field.step (1 par défaut), unité affichée si le champ en a une. */
 function counter(ctx, field, b, labelId, reg) {
+  var pas = field.step || 1;
   var val = h('output', { class: 'ct-val', 'aria-live': 'polite', 'aria-labelledby': labelId });
   function step(d) {
     if (ctx.readOnly()) return;
     var v = b.get();
     var n;
-    if (v === undefined || v === null) n = d > 0 ? Math.max(field.min, 1) : field.min;
-    else n = Math.min(field.max, Math.max(field.min, v + d));
+    if (v === undefined || v === null) n = d > 0 ? Math.max(field.min, pas) : field.min;
+    else n = Math.min(field.max, Math.max(field.min, v + d * pas));
     b.set(n);
     ctx.commit();
   }
@@ -148,13 +152,13 @@ function counter(ctx, field, b, labelId, reg) {
   reg.push(function () {
     var v = b.get();
     var unset = v === undefined || v === null;
-    val.textContent = unset ? '-' : String(v);
+    val.textContent = unset ? '-' : String(v) + (field.unit ? ' ' + field.unit : '');
     val.classList.toggle('unset', unset);
     var ro = ctx.readOnly();
     minus.disabled = ro || (!unset && v <= field.min);
     plus.disabled = ro || (!unset && v >= field.max);
   });
-  return h('div', { class: 'counter' }, minus, val, plus);
+  return h('div', { class: 'counter' + (field.unit ? ' unit' : '') }, minus, val, plus);
 }
 
 /** Texte libre : enregistré en continu (dictée du clavier possible). editable : remarques, modifiables par tous. */
@@ -398,6 +402,38 @@ function perOption(ctx, field, reg) {
   return box;
 }
 
+/** Champ d'une ancienne version du questionnaire (F12 en 2.0) : valeur affichée en lecture seule, rien à saisir. */
+function ancien(ctx, field, b, reg) {
+  var p = h('p', { class: 'ancien-val' });
+  reg.push(function () {
+    var v = b.get();
+    p.textContent = field.l + ' : ' + v + (field.unit ? ' ' + field.unit : '') + ' (ancienne version)';
+  });
+  return p;
+}
+
+/** Valeur estimée affichée sous le champ (F12 : volume déduit de la durée de vol). */
+function estimationLine(ctx, field, reg) {
+  var p = h('p', { class: 'f-est', 'aria-live': 'polite' });
+  reg.push(function () {
+    var est = M.estimation(ctx.q, field, ctx.fiche());
+    p.hidden = est === null;
+    p.textContent = est === null ? '' : estimationTexte(field, est);
+  });
+  return p;
+}
+
+/** Aides attachées à une option (C2 « Sans apport »), affichées sous les pastilles. */
+function optionAides(options) {
+  return options
+    .filter(function (o) {
+      return o.aide;
+    })
+    .map(function (o) {
+      return h('p', { class: 'hint opt-aide', 'data-aide': o.v }, h('strong', null, o.l + ' : '), o.aide);
+    });
+}
+
 /** Un champ avec son libellé. visKey : clé dont dépend l'affichage (champ de premier niveau), null sinon. */
 function fieldBlock(ctx, field, b, reg, visKey) {
   var q = ctx.q;
@@ -405,7 +441,11 @@ function fieldBlock(ctx, field, b, reg, visKey) {
   var label = h('p', { class: 'f-l', id: lid });
   var body;
   var t = field.type;
-  if (t === 'single' || t === 'multi') body = chips(ctx, field, M.optionsOf(q, field), b, lid, reg);
+  if (field.ancien) {
+    t = 'ancien';
+    body = ancien(ctx, field, b, reg);
+  } else if (t === 'single' || t === 'multi')
+    body = [chips(ctx, field, M.optionsOf(q, field), b, lid, reg)].concat(optionAides(M.optionsOf(q, field)));
   else if (t === 'flag') body = chips(ctx, field, [{ v: true, l: field.l, exclusive: true }], b, undefined, reg);
   else if (t === 'slider') body = slider(ctx, field, b, lid, reg);
   else if (t === 'counter') body = counter(ctx, field, b, lid, reg);
@@ -420,8 +460,10 @@ function fieldBlock(ctx, field, b, reg, visKey) {
   var wrap = h(
     'div',
     { class: 'f f-' + t, 'data-key': field.key },
-    t === 'flag' || t === 'perOption' ? null : label,
-    body
+    t === 'flag' || t === 'perOption' || t === 'ancien' ? null : label,
+    field.aide ? h('p', { class: 'hint' }, field.aide) : null,
+    body,
+    field.estimation ? estimationLine(ctx, field, reg) : null
   );
   reg.push(function () {
     label.textContent = M.fieldLabel(field, ctx.fiche());
@@ -512,13 +554,110 @@ export function renderQuestion(ctx, qu, reg) {
     h('h2', { class: 'q-t' }, h('span', { class: 'q-id' }, qu.id), ' ', qu.titre),
     qu.aide ? h('p', { class: 'hint' }, qu.aide) : null
   );
+  var alerte = coherenceAlerte(ctx, qu, reg);
   qu.fields.forEach(function (f) {
     sec.appendChild(fieldBlock(ctx, f, topBinding(ctx, f.key), reg, f.key));
+    // Bandeau placé juste sous le champ concerné (F9 : sous les effets), sinon en fin de question
+    if (alerte && alerte.apres === f.key) sec.appendChild(alerte.node);
   });
+  if (alerte && !alerte.apres) sec.appendChild(alerte.node);
   reg.push(function () {
     setVisible(sec, M.questionVisible(q, qu, ctx.fiche()));
   });
   return sec;
+}
+
+/* ---------- Bandeaux de cohérence (C1 / F7, C2 / F9) : rien n'est corrigé sans l'accord de l'utilisateur ---------- */
+
+function coherenceAlerte(ctx, qu, reg) {
+  if (qu.id === 'C1') return { node: alerteC1F7(ctx, reg) };
+  if (qu.id === 'F9') return { node: alerteC2F9(ctx, reg), apres: 'f9_effets' };
+  return null;
+}
+
+/** C1 passée à « Non » alors que F7 décrit des quasi-incidents : supprimer les fiches F7, ou repasser C1 à « Oui ». */
+function alerteC1F7(ctx, reg) {
+  var q = ctx.q;
+  var txt = h('p', null);
+  var suppr = h('button', {
+    type: 'button',
+    class: 'btn danger small',
+    id: 'c1f7Suppr',
+    onclick: function () {
+      if (ctx.readOnly()) return;
+      M.clearItems(q, ctx.fiche(), 'f7');
+      ctx.commit();
+      toast('Quasi-incidents supprimés.');
+    }
+  });
+  var garder = h(
+    'button',
+    {
+      type: 'button',
+      class: 'btn small',
+      id: 'c1f7Garder',
+      onclick: function () {
+        if (ctx.readOnly()) return;
+        M.setValue(q, ctx.fiche(), 'c1', 'oui');
+        ctx.commit();
+      }
+    },
+    'Garder et repasser C1 à Oui'
+  );
+  var box = h(
+    'div',
+    { class: 'alerte', id: 'alerteC1F7', role: 'group', 'aria-label': 'Quasi-incidents décrits', hidden: true },
+    txt,
+    h('div', { class: 'alerte-a' }, suppr, garder)
+  );
+  reg.push(function () {
+    var n = incoherenceC1F7(q, ctx.fiche());
+    setVisible(box, n > 0);
+    if (!n) return;
+    txt.textContent =
+      'C1 est à « Non », mais la phase Vol (F7) contient ' +
+      pluriel(n, 'quasi-incident décrit', 'quasi-incidents décrits') +
+      '.';
+    suppr.textContent =
+      n > 1 ? 'Supprimer les ' + n + ' quasi-incidents décrits' : 'Supprimer le quasi-incident décrit';
+    var ro = ctx.readOnly();
+    suppr.disabled = ro;
+    garder.disabled = ro;
+  });
+  return box;
+}
+
+/** C2 « Sans apport » alors que des effets sont cochés en F9 : proposition de revoir C2, sans rien changer. */
+function alerteC2F9(ctx, reg) {
+  var box = h(
+    'div',
+    { class: 'alerte', id: 'alerteC2F9', role: 'note', hidden: true },
+    h(
+      'p',
+      null,
+      'À chaud, C2 indique « Sans apport », alors que des effets sont cochés ici. Une recherche négative qui écarte une zone est une levée de doute.'
+    ),
+    h(
+      'div',
+      { class: 'alerte-a' },
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'btn small',
+          id: 'revoirC2',
+          onclick: function () {
+            if (ctx.goQuestion) ctx.goQuestion('chaud', 'C2');
+          }
+        },
+        'Revoir C2 (À chaud)'
+      )
+    )
+  );
+  reg.push(function () {
+    setVisible(box, incoherenceC2F9(ctx.q, ctx.fiche()));
+  });
+  return box;
 }
 
 /** Remarques du second, en fin de phase : modifiables quel que soit le rôle. */

@@ -15,9 +15,11 @@ import {
   phaseQuestions,
   statutLabel,
   cleanText,
-  isEmpty
+  isEmpty,
+  estimation
 } from './model.js';
 import { APP_VERSION } from './version.js';
+import { DEBIT_GO_PAR_MIN, DEBIT_A_CALIBRER } from './config.js';
 
 export var DATA_TAG = 'esam-debrief-data:v1';
 
@@ -146,6 +148,11 @@ export function frontmatter(q, fiche) {
         fm[f.key] = m;
       } else {
         fm[f.key] = closedValue(q, f, fiche);
+        if (f.estimation) {
+          var est = estimation(q, f, fiche);
+          fm[f.estimation.key] = est;
+          if (f.estimation.debitKey) fm[f.estimation.debitKey] = est === null ? null : DEBIT_GO_PAR_MIN;
+        }
       }
     });
     (qu.derived || []).forEach(function (d) {
@@ -213,8 +220,9 @@ function fieldLines(q, f, fiche, val) {
               .join(', ')
         ];
   if (f.type === 'flag') return val ? ['- ' + label] : [];
-  if (f.type === 'slider') return isEmpty(val) ? [] : ['- ' + label + ' : ' + val + ' ' + f.unit];
-  if (f.type === 'counter') return isEmpty(val) ? [] : ['- ' + label + ' : ' + val];
+  if (f.type === 'slider')
+    return isEmpty(val) ? [] : ['- ' + label + ' : ' + val + ' ' + f.unit + (f.ancien ? ' (ancienne version)' : '')];
+  if (f.type === 'counter') return isEmpty(val) ? [] : ['- ' + label + ' : ' + val + (f.unit ? ' ' + f.unit : '')];
   if (f.type === 'text') return isEmpty(val) ? [] : ['- ' + label + ' :', '', quote(val), ''];
   return [];
 }
@@ -252,16 +260,37 @@ function questionBody(q, qu, fiche) {
     } else if (f.type === 'perOption') {
       var cur = a[f.key] || {};
       perOptionRows(q, f, fiche).forEach(function (o) {
-        if (cur[o.v]) lines.push('- ' + stripQuotes(f.l) + ' ' + o.l + ' : ' + lbl(f.options, cur[o.v]));
+        if (cur[o.v]) lines.push('- ' + stripQuotes(f.lNote || f.l) + ' ' + o.l + ' : ' + lbl(f.options, cur[o.v]));
       });
     } else {
       var l = fieldLines(q, Object.assign({}, f, { l: labelOf(f, fiche) }), fiche, a[f.key]);
       lines.push.apply(lines, l);
+      if (f.estimation) {
+        var est = estimation(q, f, fiche);
+        if (est !== null) lines.push('- ' + estimationTexte(f, est));
+      }
     }
   });
   if (!lines.length) lines.push('Non renseigné.');
   while (lines.length && lines[lines.length - 1] === '') lines.pop();
   return out.concat(lines, ['']);
+}
+
+/** « Volume estimé : 45 Go (débit provisoire de 1 Go/min, à calibrer) », repris dans l'appli. */
+export function estimationTexte(f, est) {
+  var e = f.estimation;
+  var n = String(est).replace('.', ',');
+  var d = String(DEBIT_GO_PAR_MIN).replace('.', ',');
+  return (
+    e.l +
+    ' : ' +
+    n +
+    ' ' +
+    e.unit +
+    (DEBIT_A_CALIBRER
+      ? ' (débit provisoire de ' + d + ' ' + e.unit + '/min, à calibrer)'
+      : ' (' + d + ' ' + e.unit + '/min)')
+  );
 }
 
 function roleLabel(q, v) {

@@ -10,6 +10,7 @@ import { $, h, hm, dateTime, toast } from './util.js';
 import { APP_VERSION } from './version.js';
 import { filterFiches, years, ficheResume, ETATS } from './history.js';
 import { computeStats } from './stats.js';
+import { aVerifier } from './coherence.js';
 import { readNote, decision } from './importer.js';
 import { noteNodes } from './view.js';
 import * as cloud from './cloud.js';
@@ -123,8 +124,31 @@ var ctx = {
   readOnly: function () {
     return ctx.role() !== 'pilote';
   },
-  commit: commit
+  commit: commit,
+  // Lien d'un bandeau vers une question d'une autre phase (F9 vers C2)
+  goQuestion: function (phaseId, qid) {
+    focusQuestion = qid;
+    flush().then(function () {
+      var base = '#/f/' + encodeURIComponent(cur.debrief_id);
+      go(phaseId === 'chaud' ? base + '/chaud' : base + '/p/' + phaseId);
+    });
+  }
 };
+var focusQuestion = null; // question à montrer à l'arrivée sur l'écran suivant
+
+/** Fait défiler jusqu'à la question demandée par un lien de bandeau, et y place le focus. */
+function showFocusQuestion() {
+  var qid = focusQuestion;
+  focusQuestion = null;
+  var sec = qid && document.getElementById('q-' + qid);
+  if (!sec) return;
+  sec.scrollIntoView({ block: 'start' });
+  var t = sec.querySelector('.q-t');
+  if (t) {
+    t.setAttribute('tabindex', '-1');
+    t.focus({ preventScroll: true });
+  }
+}
 
 /* ---------- Navigation ---------- */
 
@@ -783,6 +807,7 @@ function hotScreen() {
   body.push(h('div', { class: 'actions' }, done));
   screen(body, 'À chaud');
   refresh();
+  showFocusQuestion();
 }
 
 /* ---------- À froid ---------- */
@@ -820,6 +845,7 @@ function phaseScreen(phaseId) {
   body.push(nav);
   screen(body, p.l);
   refresh();
+  showFocusQuestion();
 }
 
 /* ---------- Note ---------- */
@@ -1099,6 +1125,56 @@ function blocNodes(b, sur) {
   return [];
 }
 
+/** Bloc « Fiches à vérifier » : incohérences et debriefs non terminés, avec un lien vers chaque fiche. */
+function verifBlock(list) {
+  var v = aVerifier(q, list);
+  function items(rows, kind) {
+    return h(
+      'ul',
+      { 'data-verif': kind },
+      rows.map(function (r) {
+        return h(
+          'li',
+          { 'data-id': r.fiche.debrief_id },
+          h(
+            'a',
+            { href: '#/f/' + encodeURIComponent(r.fiche.debrief_id) + '/voir' },
+            ficheTitle(r.fiche) || 'Sans titre'
+          ),
+          r.raisons.map(function (x) {
+            return h('span', { class: 'raison', 'data-raison': x.id }, x.l);
+          })
+        );
+      })
+    );
+  }
+  var n = v.incoherences.length + v.nonTermines.length;
+  return h(
+    'section',
+    { class: 'block verif', id: 'aVerifier' },
+    h('h3', { class: 'st-h' }, 'Fiches à vérifier'),
+    n
+      ? h(
+          'p',
+          { class: 'hint' },
+          "Rien n'est corrigé automatiquement : ouvre la fiche pour la consulter, puis la compléter."
+        )
+      : h('p', { class: 'hint' }, 'Aucune fiche à vérifier sur cette période.'),
+    v.incoherences.length
+      ? [
+          h('h4', { class: 'st-qt' }, 'Incohérences (' + v.incoherences.length + ')'),
+          items(v.incoherences, 'incoherences')
+        ]
+      : null,
+    v.nonTermines.length
+      ? [
+          h('h4', { class: 'st-qt' }, 'Debriefs non terminés (' + v.nonTermines.length + ')'),
+          items(v.nonTermines, 'non-termines')
+        ]
+      : null
+  );
+}
+
 function statsScreen() {
   cur = null;
   var seq = navSeq;
@@ -1157,6 +1233,7 @@ function statsScreen() {
           )
         );
       }
+      body.appendChild(verifBlock(list));
       st.phases.forEach(function (p) {
         body.appendChild(
           h(

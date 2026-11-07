@@ -1,6 +1,7 @@
 /* Historique des debriefs (sans DOM, testé sous Node) : recherche, filtres par état et par année, tri, résumé
  * d'une fiche pour la liste d'accueil. */
 import { ficheTitre, nonEngage, effective, indexFields, isEmpty } from './model.js';
+import { avecQuasiIncident } from './coherence.js';
 
 /** Date de l'intervention (AAAA-MM-JJ), à défaut date de création. */
 export function ficheDate(fiche) {
@@ -114,7 +115,8 @@ export function ficheResume(q, fiche) {
       );
   }
   var c1 = effective(q, 'c1', fiche);
-  if (c1 === 'oui') parts.push('Quasi-incident');
+  // Un quasi-incident décrit en F7 compte même si C1 est à « Non » (fiche à vérifier dans les statistiques)
+  if (avecQuasiIncident(q, fiche)) parts.push('Quasi-incident');
   else if (c1 === 'non') parts.push('Sans quasi-incident');
   return parts.join(' ; ');
 }

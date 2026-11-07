@@ -1,5 +1,5 @@
 {
-  "version": "2.0",
+  "version": "2.1",
   "titre": "Debrief des vols drone ESAM",
   "roles": [
     { "v": "pilote", "l": "Pilote" },
@@ -88,7 +88,12 @@
             { "v": "guidage-equipe", "l": "Guidage de l'équipe" },
             { "v": "surveillance-animal", "l": "Surveillance de l'animal" },
             { "v": "autre", "l": "Autre" },
-            { "v": "sans-apport", "l": "Sans apport", "exclusive": true },
+            {
+              "v": "sans-apport",
+              "l": "Sans apport",
+              "exclusive": true,
+              "aide": "Le drone n'a rien changé, même pas une zone écartée ou une décision. Une recherche négative qui écarte une zone est une levée de doute."
+            },
             { "v": "non-engage", "l": "Non engagé", "exclusive": true }
           ]
         }
@@ -447,6 +452,30 @@
             { "v": "tiers", "l": "Tiers" }
           ]
         },
+        {
+          "key": "f6_obstacles_reperes",
+          "type": "multi",
+          "l": "Obstacles repérés à l'installation",
+          "aide": "Facultatif. Un obstacle hors trajectoire n'est pas un quasi-incident.",
+          "options": [
+            { "v": "ligne-electrique", "l": "Ligne électrique" },
+            { "v": "cable", "l": "Câble (téléphérique, remontée, forestier)" },
+            { "v": "arbre-vegetation", "l": "Arbre ou végétation haute" },
+            { "v": "paroi", "l": "Paroi" },
+            { "v": "autre", "l": "Autre" }
+          ]
+        },
+        {
+          "key": "f6_obstacles_trajectoire",
+          "type": "perOption",
+          "source": "f6_obstacles_reperes",
+          "l": "Position par rapport à la trajectoire",
+          "lNote": "Obstacle",
+          "options": [
+            { "v": "sur-trajectoire", "l": "Sur la trajectoire" },
+            { "v": "hors-trajectoire", "l": "Hors trajectoire" }
+          ]
+        },
         { "key": "f6_commentaire", "type": "text", "multiline": true, "l": "Commentaire" }
       ]
     },
@@ -646,10 +675,36 @@
       "phase": "derushage",
       "parcours": "engage",
       "titre": "Volume enregistré par le drone",
-      "aide": "Drone uniquement, pas les smartphones.",
+      "aide": "Drone uniquement, pas les smartphones. Une estimation suffit : les durées exactes restent celles d'Airdata. Le volume est déduit de la durée (4 flux enregistrés : Screen, Wide, Thermal, Zoom).",
       "usage": "Dimensionner les cartes SD et le futur boîtier de sauvegarde terrain",
       "fields": [
-        { "key": "f12_volume", "type": "slider", "l": "Volume enregistré", "min": 0, "max": 512, "step": 8, "unit": "Go" }
+        {
+          "key": "f12_duree_min",
+          "type": "counter",
+          "l": "Durée totale de vol, approximative",
+          "min": 0,
+          "max": 600,
+          "step": 5,
+          "unit": "min",
+          "estimation": {
+            "key": "f12_volume_estime",
+            "debitKey": "f12_debit_go_min",
+            "l": "Volume estimé",
+            "stat": "Volume enregistré (saisi en version 2.0, sinon estimé)",
+            "unit": "Go",
+            "ancien": "f12_volume"
+          }
+        },
+        {
+          "key": "f12_volume",
+          "type": "slider",
+          "l": "Volume saisi",
+          "ancien": true,
+          "min": 0,
+          "max": 512,
+          "step": 8,
+          "unit": "Go"
+        }
       ]
     },
     {

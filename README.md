@@ -26,7 +26,7 @@ Site statique sans build, servi tel quel (GitHub Pages), sur le modèle de `julo
 
 | Fichier | Rôle |
 | --- | --- |
-| `questionnaire.json` | Questionnaire (version 2.0) : phases, questions, options, conditions, préremplissages. Seul fichier à modifier pour le faire évoluer |
+| `questionnaire.json` | Questionnaire (version 2.1) : phases, questions, options, conditions, préremplissages. Seul fichier à modifier pour le faire évoluer |
 | `index.html`, `app.css` | Page et styles (charte ESAM, thème clair et sombre) |
 | `js/app.js` | Écrans, navigation, enregistrement automatique, import, statistiques, synchronisation |
 | `js/form.js` | Moteur de formulaire : dessine les questions du questionnaire |
@@ -35,11 +35,12 @@ Site statique sans build, servi tel quel (GitHub Pages), sur le modèle de `julo
 | `js/store.js` | Stockage sur l'appareil (IndexedDB, repli localStorage, copie de secours, suppressions à transmettre) |
 | `js/history.js` | Historique : recherche, filtres, tri, résumé d'une fiche |
 | `js/stats.js` | Statistiques : indicateurs, debriefs par mois, répartition par question |
+| `js/coherence.js` | Cohérence entre réponses (C1 / F7, C2 / F9) : bandeaux du formulaire, fiches à vérifier |
 | `js/importer.js` | Import de notes : bloc de reprise, ou reconstruction depuis le frontmatter |
 | `js/view.js` | Consultation : la note affichée en page |
 | `js/sync.js` | Plan de synchronisation (la plus récente l'emporte, suppressions) |
 | `js/cloud.js` | Supabase : connexion par code e-mail, appels REST, synchronisation |
-| `js/config.js` | Adresse et clé publique du projet Supabase |
+| `js/config.js` | Adresse et clé publique du projet Supabase ; débit d'enregistrement du drone pour F12 (à calibrer : [docs/CALIBRAGE_DEBIT.md](docs/CALIBRAGE_DEBIT.md)) |
 | `supabase/migrations/` | Tables, règles d'accès et déclencheur de la base |
 | `js/geo.js` | Position du téléphone pour préremplir le lieu (GPS de l'appareil, sans service tiers) |
 | `js/exporter.js` | Copie, téléchargement, partage natif, avec replis |
