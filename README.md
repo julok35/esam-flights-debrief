@@ -41,7 +41,8 @@ Site statique sans build, servi tel quel (GitHub Pages), sur le modèle de `julo
 | `js/sync.js` | Plan de synchronisation (la plus récente l'emporte, suppressions) |
 | `js/cloud.js` | Supabase : connexion par code e-mail, appels REST, synchronisation |
 | `js/config.js` | Adresse et clé publique du projet Supabase ; débit d'enregistrement du drone pour F12 (à calibrer : [docs/CALIBRAGE_DEBIT.md](docs/CALIBRAGE_DEBIT.md)) |
-| `supabase/migrations/` | Tables, règles d'accès et déclencheur de la base |
+| `supabase/migrations/` | Tables, règles d'accès et déclencheur de la base ; fonction `battement()` |
+| `scripts/battement.js`, `.github/workflows/battement-supabase.yml` | Requête quotidienne qui évite la mise en pause du projet Supabase ([docs/SUPABASE.md](docs/SUPABASE.md)) |
 | `js/geo.js` | Position du téléphone pour préremplir le lieu (GPS de l'appareil, sans service tiers) |
 | `js/exporter.js` | Copie, téléchargement, partage natif, avec replis |
 | `sw.js`, `manifest.webmanifest` | Hors ligne et installation |
