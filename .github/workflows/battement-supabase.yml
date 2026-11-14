@@ -1,0 +1,38 @@
+# Maintient le projet Supabase actif : sans activité suffisante pendant environ une semaine, un projet gratuit est mis
+# en pause (docs/SUPABASE.md, « Éviter la mise en pause »). Une requête par jour sur la base, avec la clé publique.
+# En cas d'échec (projet en pause, fonction absente), GitHub prévient par e-mail.
+name: Battement Supabase
+on:
+  schedule:
+    # Tous les jours à 05 h 17 UTC (une planification ne tourne que depuis la branche principale)
+    - cron: '17 5 * * *'
+  # Lancement à la main : onglet Actions, « Battement Supabase », « Run workflow »
+  workflow_dispatch:
+  # Vérification immédiate quand le battement lui-même est modifié
+  push:
+    paths:
+      - .github/workflows/battement-supabase.yml
+      - scripts/battement.js
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: battement-supabase
+jobs:
+  battement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Requête sur la base
+        run: node scripts/battement.js
+      # GitHub suspend les planifications d'un dépôt resté 60 jours sans activité : réactiver l'atelier à chaque
+      # passage remet ce délai à zéro.
+      - name: Garder la planification active
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/battement-supabase.yml/enable"

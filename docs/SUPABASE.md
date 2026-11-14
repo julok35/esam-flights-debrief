@@ -90,12 +90,38 @@ son frontmatter : les réponses fermées sont retrouvées, pas les textes libres
 
 ## Bon à savoir
 
-- **Offre gratuite** : largement suffisante. Un projet gratuit sans aucune activité pendant une semaine est mis en
-  pause ; le réactiver d'un clic depuis le tableau de bord. Les fiches restent sur les téléphones pendant ce temps.
+- **Offre gratuite** : largement suffisante. Un projet gratuit sans activité suffisante pendant environ une semaine
+  est mis en pause : voir « Éviter la mise en pause » ci-dessous. Les fiches restent sur les téléphones pendant ce temps.
 - **E-mails** : l'envoi intégré de Supabase est limité à quelques e-mails par heure. Pour une équipe, configurer un
   serveur d'envoi (Authentication, Emails, SMTP Settings).
 - **Sauvegarde** : l'export Obsidian reste la copie de référence ; la base en ligne n'est pas une archive.
 - **Voir les fiches dans la base** : Table Editor, table `fiches` (colonne `data` : la fiche complète en JSON).
+
+## Éviter la mise en pause
+
+Supabase met en pause un projet gratuit qui n'a pas reçu assez de requêtes pendant environ une semaine, après un
+e-mail d'avertissement (« Your Supabase Project is going to be paused »). Quelques synchronisations isolées ne
+suffisent pas toujours : l'avertissement du 14 novembre 2026 est arrivé moins de 6 jours après la dernière.
+
+Pour que cela n'arrive pas, un **battement** envoie une requête à la base chaque jour, même quand personne n'ouvre
+l'appli :
+
+- [`.github/workflows/battement-supabase.yml`](../.github/workflows/battement-supabase.yml) : atelier GitHub Actions
+  planifié tous les jours (05 h 17 UTC), qui lance [`scripts/battement.js`](../scripts/battement.js). Il se réactive
+  lui-même à chaque passage, car GitHub suspend les planifications d'un dépôt resté 60 jours sans activité.
+- [`supabase/migrations/20261114120000_battement.sql`](../supabase/migrations/20261114120000_battement.sql) : fonction
+  `battement()` de la base, appelée avec la clé publique. Elle renvoie l'heure de la base et ne lit ni ne modifie
+  aucune donnée. **À exécuter une fois dans le SQL Editor**, comme le script des tables.
+
+L'appli n'envoie rien de plus : le battement part de GitHub, pas des téléphones.
+
+**Vérifier** : sur GitHub, onglet **Actions**, **Battement Supabase**. Un passage vert par jour ; **Run workflow**
+le lance à la main. En cas d'échec, GitHub envoie un e-mail et le journal du passage dit quoi faire (fonction absente
+de la base, projet en pause).
+
+**Si le projet est quand même en pause** : tableau de bord Supabase, **Restore project** (possible pendant 90 jours ;
+au-delà, les données ne sont plus récupérables que par une sauvegarde à télécharger). Les fiches restent sur les
+téléphones et repartent à la synchronisation suivante.
 
 ## En cas de problème
 
@@ -106,4 +132,5 @@ son frontmatter : les réponses fermées sont retrouvées, pas les textes libres
 | « Code incorrect ou expiré » | Le code vaut une heure et une seule fois : en demander un nouveau. |
 | « Trop de demandes » | Limite d'envoi d'e-mails atteinte : attendre, ou configurer un SMTP. |
 | « Lien de connexion refusé » | Lien déjà utilisé ou expiré, ou adresse de l'appli absente des Redirect URLs (étape 4). |
+| E-mail « Your Supabase Project is going to be paused » | Vérifier le battement (« Éviter la mise en pause ») ; ouvrir l'appli connectée relance aussi l'activité. |
 | « Session expirée : reconnecte-toi » | Session révoquée (déconnexion ailleurs, projet réinitialisé) : se reconnecter. |
